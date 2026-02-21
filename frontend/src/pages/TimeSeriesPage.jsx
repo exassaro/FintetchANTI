@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, Activity } from 'lucide-react';
+import { AlertTriangle, Activity, Calendar } from 'lucide-react';
 import {
     LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
     ResponsiveContainer, Legend
 } from 'recharts';
 import { usePipeline } from '../context/PipelineContext';
 import { getTimeSeries } from '../api/analytics';
+import { Skeleton, Alert as MuiAlert, Box } from '@mui/material';
 
 const fmtINR = (v) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
@@ -16,7 +17,11 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
         <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
             <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
-            {payload.map(p => <p key={p.dataKey} style={{ color: p.color }}>{p.name}: <strong>{p.value > 1000 ? fmtINR(p.value) : p.value}</strong></p>)}
+            {payload.filter(p => p.value != null).map(p => (
+                <p key={p.dataKey} style={{ color: p.color }}>
+                    {p.name}: <strong>{typeof p.value === 'number' && p.value > 100 ? fmtINR(p.value) : p.value}</strong>
+                </p>
+            ))}
         </div>
     );
 };
@@ -35,6 +40,7 @@ export default function TimeSeriesPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [anim, setAnim] = useState(false);
 
     useEffect(() => {
         if (!uploadId) { navigate('/'); return; }
@@ -80,17 +86,17 @@ export default function TimeSeriesPage() {
                     </div>
 
                     {loading ? (
-                        <div className="loading-overlay"><div className="spinner" /></div>
+                        <Box sx={{ p: 3 }}><Skeleton variant="rounded" height={360} animation="wave" /></Box>
                     ) : (
                         <div className="chart-container" style={{ height: 360 }}>
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={chartData} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
+                                <LineChart data={chartData} margin={{ top: 10, right: 20, bottom: 5, left: 0 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                     <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="4 4" />
                                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                    <Tooltip content={<CustomTooltip />} />
+                                    <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                     <Line
-                                        type="monotone"
+                                        type="linear"
                                         dataKey="value"
                                         name={METRICS.find(m => m.value === metric)?.label}
                                         stroke="#059669"
@@ -123,7 +129,9 @@ export default function TimeSeriesPage() {
 
                 {!loading && chartData.length === 0 && (
                     <div className="empty-state">
-                        <div className="empty-state-icon">📅</div>
+                        <div className="empty-state-icon" style={{ background: 'transparent', boxShadow: 'none' }}>
+                            <Calendar size={48} color="var(--text-muted)" />
+                        </div>
                         <h3>No time-series data</h3>
                         <p>Ensure your CSV contains a date/transaction_date column.</p>
                     </div>

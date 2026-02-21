@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, TrendingUp } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Bot, BarChart2, CalendarClock } from 'lucide-react';
 import {
     ComposedChart, Line, Area, XAxis, YAxis, Tooltip,
     CartesianGrid, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import { usePipeline } from '../context/PipelineContext';
 import { getForecast } from '../api/analytics';
+import { Skeleton, Box } from '@mui/material';
 
 const fmtINR = (v) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
@@ -16,7 +17,11 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
         <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
             <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
-            {payload.map(p => <p key={p.dataKey} style={{ color: p.color }}>{p.name}: <strong>{p.value > 1000 ? fmtINR(p.value) : p.value?.toFixed(2)}</strong></p>)}
+            {payload.filter(p => p.value != null).map(p => (
+                <p key={p.dataKey} style={{ color: p.color }}>
+                    {p.name}: <strong>{Array.isArray(p.value) ? `${fmtINR(p.value[0])} - ${fmtINR(p.value[1])}` : (p.value > 1000 ? fmtINR(p.value) : p.value?.toFixed(2))}</strong>
+                </p>
+            ))}
         </div>
     );
 };
@@ -35,6 +40,7 @@ export default function ForecastPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [anim, setAnim] = useState(false);
 
     const load = () => {
         if (!uploadId) { navigate('/'); return; }
@@ -57,6 +63,7 @@ export default function ForecastPage() {
         forecast: f.yhat,
         upper: f.yhat_upper,
         lower: f.yhat_lower,
+        confidenceBand: [f.yhat_lower, f.yhat_upper],
         model: f.model_used,
     })) || [];
 
@@ -93,9 +100,9 @@ export default function ForecastPage() {
                 {meta && (
                     <div className="card card-sm animate-fade" style={{ marginBottom: 20 }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
-                            <span className="chip chip-violet">🤖 Model: {meta.model_used}</span>
-                            <span className="chip chip-blue">📊 {meta.n_points} historical points</span>
-                            <span className="chip chip-green">🔮 {meta.horizon_months} months horizon</span>
+                            <span className="chip chip-violet" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Bot size={12} /> Model: {meta.model_used}</span>
+                            <span className="chip chip-blue" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><BarChart2 size={12} /> {meta.n_points} historical points</span>
+                            <span className="chip chip-green" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarClock size={12} /> {meta.horizon_months} months horizon</span>
                             {meta.warnings?.length > 0 && (
                                 <span className="chip chip-amber"><AlertTriangle size={11} /> {meta.warnings[0]}</span>
                             )}
@@ -113,20 +120,34 @@ export default function ForecastPage() {
                     </div>
 
                     {loading ? (
-                        <div className="loading-overlay"><div className="spinner" /></div>
+                        <Box sx={{ p: 3 }}><Skeleton variant="rounded" height={380} animation="wave" /></Box>
                     ) : (
                         <div className="chart-container" style={{ height: 380 }}>
                             <ResponsiveContainer width="100%" height="100%">
-                                <ComposedChart data={chartData} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
+                                <ComposedChart data={chartData} margin={{ top: 10, right: 20, bottom: 10, left: 0 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
+                                    <defs>
+                                        <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.12} />
+                                            <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="confidenceGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#6366F1" stopOpacity={0.15} />
+                                            <stop offset="95%" stopColor="#6366F1" stopOpacity={0.04} />
+                                        </linearGradient>
+                                    </defs>
                                     <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="4 4" />
                                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                    <Tooltip content={<CustomTooltip />} />
+                                    <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                     <ReferenceLine x={lastHistoryMonth} stroke="#CBD5E1" strokeDasharray="4 4" label={{ value: 'Forecast →', position: 'insideTopRight', fill: 'var(--text-muted)', fontSize: 11 }} />
-                                    <Line type="monotone" dataKey="historical" stroke="#059669" strokeWidth={2} dot={false} name="Historical" />
-                                    <Area type="monotone" dataKey="forecast" stroke="#6366F1" strokeWidth={2.5} fill="url(#forecastGrad)" fillOpacity={0.4} dot={{ r: 4, fill: '#6366F1' }} name="Forecast" />
-                                    <Line type="monotone" dataKey="upper" stroke="#CBD5E1" strokeWidth={1} strokeDasharray="3 3" dot={false} name="Upper Bound" />
-                                    <Line type="monotone" dataKey="lower" stroke="#CBD5E1" strokeWidth={1} strokeDasharray="3 3" dot={false} name="Lower Bound" />
+                                    {/* Shaded confidence band between lower and upper bounds */}
+                                    <Area type="linear" dataKey="confidenceBand" stroke="none" fill="url(#confidenceGrad)" fillOpacity={1} name="Confidence Band" />
+                                    {/* Upper & lower bound dashed border lines */}
+                                    <Line type="linear" dataKey="upper" stroke="#A5B4FC" strokeWidth={1} strokeDasharray="4 3" dot={false} name="Upper Bound" />
+                                    <Line type="linear" dataKey="lower" stroke="#A5B4FC" strokeWidth={1} strokeDasharray="4 3" dot={false} name="Lower Bound" />
+                                    {/* Main lines */}
+                                    <Line type="linear" dataKey="historical" stroke="#059669" strokeWidth={2} dot={false} name="Historical" />
+                                    <Area type="linear" dataKey="forecast" stroke="#6366F1" strokeWidth={2.5} fill="url(#forecastGrad)" fillOpacity={0.4} dot={{ r: 4, fill: '#6366F1' }} name="Forecast" />
                                 </ComposedChart>
                             </ResponsiveContainer>
                         </div>
@@ -150,12 +171,7 @@ export default function ForecastPage() {
                                         <th>Model</th>
                                     </tr>
                                 </thead>
-                                <defs>
-                                    <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.12} />
-                                        <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
+
                                 <tbody>
                                     {forecastData.map((r, i) => (
                                         <tr key={i}>

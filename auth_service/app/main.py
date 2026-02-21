@@ -1,0 +1,57 @@
+# app/main.py
+
+import logging
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.db.base import Base
+from app.db.session import engine, SessionLocal
+from app.api.auth import router as auth_router
+from app.services.seed import seed_admin
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("auth_service")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ── Startup ──
+    logger.info("Auth Service starting up...")
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables ensured.")
+
+    # Seed default admin
+    db = SessionLocal()
+    try:
+        seed_admin(db)
+    finally:
+        db.close()
+
+    yield
+
+    # ── Shutdown ──
+    logger.info("Auth Service shutting down.")
+
+
+app = FastAPI(
+    title="FintechAnti Auth Service",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth_router)
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "auth"}

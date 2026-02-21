@@ -77,10 +77,10 @@ def detect_intent(query: str):
 
     q = query.lower()
 
-    if "kpi" in q or "financial" in q:
+    if "kpi" in q or "financial" in q or "liability" in q or "total spend" in q:
         return "financial_kpi"
 
-    if "compliance" in q or "risk" in q:
+    if "compliance" in q or "risk" in q or "tax rate" in q or "confidence" in q:
         return "compliance_kpi"
 
     if "forecast" in q or "predict" in q:
@@ -94,6 +94,12 @@ def detect_intent(query: str):
 
     if "itc ratio" in q:
         return "itc_ratio"
+
+    if "slab" in q:
+        return "slab_distribution"
+
+    if "highest" in q or "anomal" in q:
+        return "top_anomalies"
 
     if "explain" in q:
         return "explain_row"
@@ -116,172 +122,112 @@ def chatbot_query(
     intent = detect_intent(payload.query)
 
     # --------------------------------------------------
-    # 1️⃣ FINANCIAL KPI
+    # SETUP
     # --------------------------------------------------
+    data_context = None
 
     if intent == "financial_kpi":
-
-        result = aggregation_engine.compute_dashboard_summary(
+        data_context = aggregation_engine.compute_dashboard_summary(
             payload.upload_id,
             anomaly_run.anomaly_file_path
         )
 
-        return {
-            "intent": intent,
-            "data": result
-        }
-
-    # --------------------------------------------------
-    # 2️⃣ COMPLIANCE KPI
-    # --------------------------------------------------
-
-    if intent == "compliance_kpi":
-
+    elif intent == "compliance_kpi":
         df = csv_reader.load_dataframe(
             payload.upload_id,
             anomaly_run.anomaly_file_path
         )
+        anomaly_rate = df.get("is_anomaly", df.get("anomaly_score", pd.Series([0])) > 0.5).mean()
+        low_confidence = (df.get("gst_confidence", pd.Series([1.0])) < 0.6).sum() if "gst_confidence" in df.columns else 0
+        data_context = {"anomaly_rate": round(float(anomaly_rate), 4), "low_confidence_transactions_count": int(low_confidence)}
 
-        anomaly_rate = df["is_anomaly"].mean()
-
-        return {
-            "intent": intent,
-            "data": {
-                "anomaly_rate": round(anomaly_rate, 4)
-            }
-        }
-
-    # --------------------------------------------------
-    # 3️⃣ FORECAST
-    # --------------------------------------------------
-
-    if intent == "forecast":
-
-        result = forecast_engine.run_forecast(
+    elif intent == "forecast":
+        data_context = forecast_engine.run_forecast(
             upload_id=payload.upload_id,
             anomaly_file_path=anomaly_run.anomaly_file_path,
             metric="total_expenses",
             exclude_anomalies=True
         )
 
-        return {
-            "intent": intent,
-            "data": result
-        }
-
-    # --------------------------------------------------
-    # 4️⃣ VENDOR DISTRIBUTION
-    # --------------------------------------------------
-
-    if intent == "vendor_distribution":
-
+    elif intent == "vendor_distribution":
         df = csv_reader.load_dataframe(
             payload.upload_id,
             anomaly_run.anomaly_file_path,
             columns=["vendor_name", "amount"]
         )
+        grouped = df.groupby("vendor_name")["amount"].sum().sort_values(ascending=False).head(5)
+        data_context = grouped.to_dict()
 
-        grouped = (
-            df.groupby("vendor_name")["amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-        )
-
-        return {
-            "intent": intent,
-            "data": grouped.to_dict()
-        }
-
-    # --------------------------------------------------
-    # 5️⃣ CATEGORY DISTRIBUTION
-    # --------------------------------------------------
-
-    if intent == "category_distribution":
-
+    elif intent == "category_distribution":
         df = csv_reader.load_dataframe(
             payload.upload_id,
             anomaly_run.anomaly_file_path,
             columns=["category", "amount"]
         )
+        grouped = df.groupby("category")["amount"].sum().sort_values(ascending=False).head(5)
+        data_context = grouped.to_dict()
 
-        grouped = (
-            df.groupby("category")["amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-        )
-
-        return {
-            "intent": intent,
-            "data": grouped.to_dict()
-        }
-
-    # --------------------------------------------------
-    # 6️⃣ ITC RATIO
-    # --------------------------------------------------
-
-    if intent == "itc_ratio":
-
-        df = csv_reader.load_dataframe(
-            payload.upload_id,
-            anomaly_run.anomaly_file_path
-        )
-
+    elif intent == "itc_ratio":
+        df = csv_reader.load_dataframe(payload.upload_id, anomaly_run.anomaly_file_path)
         df = csv_reader.ensure_effective_slab_column(df)
-
         df["gst_rate"] = df["gst_slab_effective"] / 100
         df["gst_liability"] = df["amount"] * df["gst_rate"]
-
         df["itc_eligible"] = df["gst_slab_effective"].isin({5, 18, 40})
+        itc_ratio = (df[df["itc_eligible"]]["amount"].sum() / df["gst_liability"].sum() if df["gst_liability"].sum() > 0 else 0)
+        data_context = {"itc_ratio": round(itc_ratio, 4), "total_gst_liability": round(df["gst_liability"].sum(), 2)}
 
-        itc_ratio = (
-            df[df["itc_eligible"]]["amount"].sum()
-            / df["gst_liability"].sum()
-            if df["gst_liability"].sum() > 0 else 0
-        )
+    elif intent == "slab_distribution":
+        df = csv_reader.load_dataframe(payload.upload_id, anomaly_run.anomaly_file_path)
+        df = csv_reader.ensure_effective_slab_column(df)
+        slab_amounts = df.groupby("gst_slab_effective")["amount"].sum().to_dict()
+        data_context = {"total_spend_amount_by_gst_slab": slab_amounts}
 
-        return {
-            "intent": intent,
-            "data": {
-                "itc_ratio": round(itc_ratio, 4)
-            }
-        }
+    elif intent == "top_anomalies":
+        df = csv_reader.load_dataframe(payload.upload_id, anomaly_run.anomaly_file_path)
+        if "anomaly_score" in df.columns:
+            top_df = df.sort_values(by="anomaly_score", ascending=False).head(5)
+            cols = ["transaction_id", "vendor_name", "amount", "anomaly_score", "anomaly_reasons"]
+            data_context = top_df[[c for c in cols if c in top_df.columns]].to_dict(orient="records")
+        else:
+            data_context = {"status": "no anomalies calculated yet"}
 
-    # --------------------------------------------------
-    # 7️⃣ EXPLAIN ROW
-    # --------------------------------------------------
-
-    if intent == "explain_row":
-
+    elif intent == "explain_row":
         if payload.row_index is None:
-            raise HTTPException(
-                status_code=400,
-                detail="row_index required for explanation."
-            )
-
+            raise HTTPException(status_code=400, detail="row_index required for explanation.")
+        
         explanation = explanation_engine.generate_explanation(
             db=db,
             upload_id=payload.upload_id,
             anomaly_file_path=anomaly_run.anomaly_file_path,
             row_index=payload.row_index,
         )
-
+        
         return {
             "intent": intent,
-            "data": explanation
+            "response": explanation.get("explanation"),
+            "model_used": explanation.get("model_used")
         }
 
-    # --------------------------------------------------
-    # 8️⃣ FALLBACK LLM
-    # --------------------------------------------------
+    elif intent == "llm_fallback":
+        try:
+            data_context = {"dataset_high_level_summary": aggregation_engine.compute_dashboard_summary(
+                payload.upload_id,
+                anomaly_run.anomaly_file_path
+            )}
+        except:
+            pass
 
+    # --------------------------------------------------
+    # FINAL LLM PASS FOR FORMATTING
+    # --------------------------------------------------
+    # Pass the query and specific data (if available) to the LLM to format cleanly natively
     explanation, model_used = call_llm({
-        "query": payload.query
+        "query": payload.query,
+        "data": data_context
     })
 
     return {
-        "intent": "llm_fallback",
+        "intent": intent,
         "model_used": model_used,
         "response": explanation
     }

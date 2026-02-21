@@ -7,17 +7,19 @@ import {
 import { usePipeline } from '../context/PipelineContext';
 import { uploadCSV } from '../api/classification';
 import { runAnomalyDetection } from '../api/anomaly';
+import { getReviewQueue } from '../api/analytics';
+import { LinearProgress, Alert as MuiAlert, Tooltip, Chip } from '@mui/material';
 
 const PIPELINE_STEPS = [
-    { id: 'upload', icon: '📤', label: 'Upload CSV', desc: 'File validated & stored' },
-    { id: 'classify', icon: '🧠', label: 'GST Classification', desc: 'ML model predicts GST slabs' },
-    { id: 'anomaly', icon: '🔍', label: 'Anomaly Detection', desc: 'Multi-signal scoring' },
-    { id: 'analytics', icon: '📊', label: 'Analytics Ready', desc: 'Insights unlocked' },
+    { id: 'upload', icon: <UploadCloud size={20} color="var(--accent-blue)" />, label: 'Upload CSV', desc: 'File validated & stored' },
+    { id: 'classify', icon: <Brain size={20} color="var(--accent-indigo)" />, label: 'GST Classification', desc: 'ML model predicts GST slabs' },
+    { id: 'anomaly', icon: <ShieldAlert size={20} color="var(--accent-rose)" />, label: 'Anomaly Detection', desc: 'Multi-signal scoring' },
+    { id: 'analytics', icon: <BarChart2 size={20} color="var(--accent-green)" />, label: 'Analytics Ready', desc: 'Insights unlocked' },
 ];
 
 export default function UploadPage() {
     const navigate = useNavigate();
-    const { setUploadId, setClassificationResult, setAnomalyResult, setPipelineStage } = usePipeline();
+    const { setUploadId, setClassificationResult, setAnomalyResult, setPipelineStage, reset } = usePipeline();
     const fileInputRef = useRef();
 
     const [file, setFile] = useState(null);
@@ -53,6 +55,7 @@ export default function UploadPage() {
     // ── Run full pipeline ────────────────────────────────────────
     const runPipeline = useCallback(async () => {
         if (!file || running) return;
+        reset();                    // clear old session data before new upload
         setRunning(true);
         setError(null);
         setCurrentStep(0);
@@ -101,6 +104,10 @@ export default function UploadPage() {
             setPipelineStage('detected');
             setCurrentStep(3);
             markStep('analytics', 'done');
+
+            // Pre-load the review queue entirely in the background so it's instantly instantly upon navigation
+            try { getReviewQueue(classData.upload_id).catch(() => { }); } catch (e) { }
+
 
         } catch (err) {
             setError(err.message);
@@ -309,9 +316,9 @@ export default function UploadPage() {
                 {!running && !allDone && !file && (
                     <div className="grid-3 section-gap animate-fade">
                         {[
-                            { icon: '🧠', title: 'Smart Classification', desc: 'ML models trained on Indian B2B GST transactions classify each row into GST slabs (0%, 5%, 12%, 18%, 28%) or HSN/SAC codes.' },
-                            { icon: '🔍', title: 'Multi-Signal Anomaly Detection', desc: 'IsolationForest + Autoencoder + NLP clustering + confidence scoring detect suspicious transactions with adaptive thresholds.' },
-                            { icon: '📊', title: 'Real-Time Analytics', desc: 'Instant dashboards, KPI reports, GST forecasting, compliance scoring, and AI-powered natural language queries.' },
+                            { icon: <Brain size={38} color="var(--accent-indigo)" />, title: 'Smart Classification', desc: 'ML models trained on Indian B2B GST transactions classify each row into GST slabs (0%, 5%, 12%, 18%, 28%) or HSN/SAC codes.' },
+                            { icon: <ShieldAlert size={38} color="var(--accent-rose)" />, title: 'Multi-Signal Anomaly Detection', desc: 'IsolationForest + Autoencoder + NLP clustering + confidence scoring detect suspicious transactions with adaptive thresholds.' },
+                            { icon: <BarChart2 size={38} color="var(--accent-green)" />, title: 'Real-Time Analytics', desc: 'Instant dashboards, KPI reports, GST forecasting, compliance scoring, and AI-powered natural language queries.' },
                         ].map(c => (
                             <div className="card" key={c.title} style={{ textAlign: 'center', padding: '32px 24px' }}>
                                 <div style={{ fontSize: '2.2rem', marginBottom: 14 }}>{c.icon}</div>

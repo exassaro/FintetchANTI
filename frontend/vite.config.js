@@ -7,25 +7,37 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      // Proxy /classify/* → Classification service (8001)
-      '/classify': {
+      // All API calls are prefixed with /api to avoid conflicting with
+      // React Router frontend routes (/dashboard, /kpi, /review, etc.).
+      // The rewrite function strips the /api prefix before forwarding.
+
+      // Auth service (8004)
+      '/api/auth': {
+        target: 'http://localhost:8004',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      // Classification service (8001)
+      '/api/classify': {
         target: 'http://localhost:8001',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
-      // Proxy /anomaly/* → Anomaly service (8002)
-      '/anomaly': {
+      // Anomaly service (8002)
+      '/api/anomaly': {
         target: 'http://localhost:8002',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
-      // Proxy analytics routes → Analytics service (8003)
-      '/dashboard': { target: 'http://localhost:8003', changeOrigin: true },
-      '/kpi': { target: 'http://localhost:8003', changeOrigin: true },
-      '/forecast': { target: 'http://localhost:8003', changeOrigin: true },
-      '/time-series': { target: 'http://localhost:8003', changeOrigin: true },
-      '/distribution': { target: 'http://localhost:8003', changeOrigin: true },
-      '/review': { target: 'http://localhost:8003', changeOrigin: true },
-      '/chatbot': { target: 'http://localhost:8003', changeOrigin: true },
-      '/explain': { target: 'http://localhost:8003', changeOrigin: true },
+      // Analytics service (8003) — all analytics routes
+      '/api/dashboard': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/kpi': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/forecast': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/time-series': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/distribution': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/review': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/chatbot': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/explain': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
     },
   },
 })

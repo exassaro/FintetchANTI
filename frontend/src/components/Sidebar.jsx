@@ -1,10 +1,11 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
     UploadCloud, LayoutDashboard, TrendingUp, BarChart2,
-    Shield, MessageSquare, Eye, Activity, ChevronRight, Zap
+    MessageSquare, Eye, Activity, Zap, Shield
 } from 'lucide-react';
 import { usePipeline } from '../context/PipelineContext';
+import { Tooltip, Chip, Box, Typography, LinearProgress, Fade } from '@mui/material';
 
 const navItems = [
     {
@@ -39,7 +40,7 @@ const stageReached = (current, required) => {
 };
 
 export default function Sidebar() {
-    const { pipelineStage, uploadId, classificationResult, anomalyResult } = usePipeline();
+    const { pipelineStage, uploadId } = usePipeline();
 
     const steps = [
         { label: 'Upload CSV', stage: 'uploading' },
@@ -54,11 +55,15 @@ export default function Sidebar() {
         return 'idle';
     };
 
+    // Calculate pipeline progress percentage
+    const completedSteps = steps.filter(s => getDotClass(s) === 'done').length;
+    const progressPercent = (completedSteps / steps.length) * 100;
+
     return (
         <aside className="sidebar">
             <div className="sidebar-logo">
                 <div className="logo-mark">
-                    <div className="logo-icon">🇮🇳</div>
+                    <div className="logo-icon"><Shield size={20} color="#fff" /></div>
                     <div className="logo-text">
                         <span className="logo-name">GSTAnalytica</span>
                         <span className="logo-tagline">SME Audit Platform</span>
@@ -73,7 +78,7 @@ export default function Sidebar() {
                         {section.items.map(item => {
                             const isDisabled = item.requiresStage && !stageReached(pipelineStage, item.requiresStage);
                             const Icon = item.icon;
-                            return (
+                            const navContent = (
                                 <NavLink
                                     key={item.to}
                                     to={item.to}
@@ -86,12 +91,40 @@ export default function Sidebar() {
                                     <Icon className="nav-icon" size={17} />
                                     {item.label}
                                     {isDisabled && (
-                                        <span className="sidebar-badge badge-pending">Pending</span>
+                                        <Chip
+                                            label="Pending"
+                                            size="small"
+                                            sx={{
+                                                ml: 'auto', height: 20, fontSize: '0.58rem',
+                                                fontWeight: 700, letterSpacing: '0.05em',
+                                                background: '#FFFBEB', color: '#92400E',
+                                                border: '1px solid #FDE68A',
+                                                '& .MuiChip-label': { px: 0.7 },
+                                            }}
+                                        />
                                     )}
                                     {!isDisabled && stageReached(pipelineStage, 'detected') && item.requiresStage && (
-                                        <span className="sidebar-badge badge-ready">Ready</span>
+                                        <Chip
+                                            label="Ready"
+                                            size="small"
+                                            sx={{
+                                                ml: 'auto', height: 20, fontSize: '0.58rem',
+                                                fontWeight: 700, letterSpacing: '0.05em',
+                                                background: '#ECFDF5', color: '#059669',
+                                                border: '1px solid #A7F3D0',
+                                                '& .MuiChip-label': { px: 0.7 },
+                                            }}
+                                        />
                                     )}
                                 </NavLink>
+                            );
+
+                            return isDisabled ? (
+                                <Tooltip key={item.to} title="Upload & process a CSV first" arrow placement="right">
+                                    <span>{navContent}</span>
+                                </Tooltip>
+                            ) : (
+                                <React.Fragment key={item.to}>{navContent}</React.Fragment>
                             );
                         })}
                     </div>
@@ -101,20 +134,53 @@ export default function Sidebar() {
             <div className="sidebar-footer">
                 <div className="pipeline-status">
                     <div className="pipeline-status-title">Pipeline Status</div>
+
+                    {/* Progress bar */}
+                    <Box sx={{ mb: 1.2 }}>
+                        <LinearProgress
+                            variant="determinate"
+                            value={progressPercent}
+                            sx={{
+                                height: 5, borderRadius: 3,
+                                backgroundColor: '#E2E8F0',
+                                '& .MuiLinearProgress-bar': {
+                                    background: progressPercent === 100
+                                        ? 'linear-gradient(90deg, #059669, #10B981)'
+                                        : 'linear-gradient(90deg, #3B82F6, #6366F1)',
+                                    borderRadius: 3,
+                                },
+                            }}
+                        />
+                        <Typography variant="caption" sx={{ mt: 0.3, display: 'block', textAlign: 'right', fontSize: '0.6rem' }}>
+                            {completedSteps}/{steps.length} complete
+                        </Typography>
+                    </Box>
+
                     <div className="pipeline-steps">
                         {steps.map((step) => (
                             <div key={step.stage} className="pipeline-step">
                                 <div className={`step-dot ${getDotClass(step)}`} />
-                                <span style={{ color: getDotClass(step) === 'done' ? '#059669' : getDotClass(step) === 'active' ? '#3B82F6' : 'var(--text-muted)', fontSize: '0.78rem' }}>
+                                <span style={{
+                                    color: getDotClass(step) === 'done' ? '#059669'
+                                        : getDotClass(step) === 'active' ? '#3B82F6'
+                                            : 'var(--text-muted)',
+                                    fontSize: '0.78rem',
+                                    fontWeight: getDotClass(step) === 'done' ? 600 : 400,
+                                }}>
                                     {step.label}
                                 </span>
+                                {getDotClass(step) === 'done' && (
+                                    <Fade in><span style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>✓</span></Fade>
+                                )}
                             </div>
                         ))}
                     </div>
                     {uploadId && (
-                        <div style={{ marginTop: 10, fontSize: '0.65rem', color: 'var(--text-muted)', wordBreak: 'break-all' }}>
-                            ID: {uploadId.slice(0, 8)}…
-                        </div>
+                        <Tooltip title={uploadId} arrow placement="top">
+                            <div style={{ marginTop: 10, fontSize: '0.65rem', color: 'var(--text-muted)', wordBreak: 'break-all', cursor: 'help' }}>
+                                ID: {uploadId.slice(0, 8)}…
+                            </div>
+                        </Tooltip>
                     )}
                 </div>
             </div>

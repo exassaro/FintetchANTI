@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, IndianRupee, Percent, ShieldCheck, TrendingDown } from 'lucide-react';
+import { AlertTriangle, IndianRupee, Percent, ShieldCheck, TrendingDown, Crosshair } from 'lucide-react';
 import {
     RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer,
     BarChart, Bar, XAxis, YAxis, Tooltip, Cell
 } from 'recharts';
 import { usePipeline } from '../context/PipelineContext';
 import { getFinancialKPIs, getComplianceKPIs } from '../api/analytics';
+import { Skeleton, Alert as MuiAlert, Box } from '@mui/material';
 
 const fmtINR = (v) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
@@ -16,7 +17,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
         <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
             <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
-            {payload.map(p => <p key={p.dataKey} style={{ color: p.color }}>{p.name}: <strong>{p.value}</strong></p>)}
+            {payload.filter(p => p.value != null).map(p => <p key={p.dataKey} style={{ color: p.color }}>{p.name}: <strong>{p.value}</strong></p>)}
         </div>
     );
 };
@@ -28,6 +29,7 @@ export default function KPIPage() {
     const [comp, setComp] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [anim, setAnim] = useState(false);
 
     useEffect(() => {
         if (!uploadId) { navigate('/'); return; }
@@ -38,10 +40,22 @@ export default function KPIPage() {
     }, [uploadId]);
 
     if (loading) return (
-        <div className="loading-overlay"><div className="spinner spinner-lg" /><p>Loading KPIs…</p></div>
+        <div className="page-body">
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2, mb: 3 }}>
+                {[...Array(4)].map((_, i) => <Skeleton key={i} variant="rounded" height={100} animation="wave" />)}
+            </Box>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                <Skeleton variant="rounded" height={320} animation="wave" />
+                <Skeleton variant="rounded" height={320} animation="wave" />
+            </Box>
+        </div>
     );
     if (error) return (
-        <div className="page-body"><div className="alert alert-error"><AlertTriangle size={18} /> {error}</div></div>
+        <div className="page-body">
+            <MuiAlert severity="error">
+                <AlertTriangle size={16} style={{ display: 'inline', marginRight: 6 }} /> {error}
+            </MuiAlert>
+        </div>
     );
 
     const compRisk = comp?.compliance_risk_score ?? 0;
@@ -100,10 +114,10 @@ export default function KPIPage() {
                     </div>
                     <div className="chart-container" style={{ height: 240 }}>
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={barData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+                            <BarChart data={barData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                 <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                <Tooltip content={<CustomTooltip />} />
+                                <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                 <Bar dataKey="value" name="Amount (₹)" radius={[4, 4, 0, 0]}>
                                     {barData.map((d, i) => <Cell key={i} fill={d.color} />)}
                                 </Bar>
@@ -142,8 +156,9 @@ export default function KPIPage() {
                                 }}>
                                     {compRisk.toFixed(1)}
                                 </div>
-                                <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: 4 }}>
-                                    {compRisk > 60 ? '🔴 High Risk' : compRisk > 35 ? '🟡 Moderate Risk' : '🟢 Low Risk'} / 100
+                                <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                    {compRisk > 60 ? <AlertTriangle size={13} color="var(--accent-rose)" /> : compRisk > 35 ? <AlertTriangle size={13} color="var(--accent-amber)" /> : <ShieldCheck size={13} color="var(--accent-emerald)" />}
+                                    <span>{compRisk > 60 ? 'High Risk' : compRisk > 35 ? 'Moderate Risk' : 'Low Risk'} / 100</span>
                                 </div>
                                 <div className="progress-bar-wrap" style={{ marginTop: 12 }}>
                                     <div className="progress-bar-fill" style={{ width: `${compRisk}%`, background: riskColor }} />
@@ -154,7 +169,9 @@ export default function KPIPage() {
                         {/* Radar Chart */}
                         <div className="card animate-fade">
                             <div className="card-header">
-                                <span className="card-title-lg">🕸️ Risk Radar</span>
+                                <span className="card-title-lg" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <Crosshair size={18} /> Risk Radar
+                                </span>
                             </div>
                             <div className="chart-container" style={{ height: 260 }}>
                                 <ResponsiveContainer width="100%" height="100%">

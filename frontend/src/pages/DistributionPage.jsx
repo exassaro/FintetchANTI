@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, BarChart2 } from 'lucide-react';
+import { AlertTriangle, BarChart2, Users } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
     ResponsiveContainer, PieChart, Pie, Legend
 } from 'recharts';
 import { usePipeline } from '../context/PipelineContext';
 import { getVendorDistribution, getCategoryDistribution } from '../api/analytics';
+import { Skeleton, Box } from '@mui/material';
 
 const COLORS = ['#059669', '#3B82F6', '#F59E0B', '#8B5CF6', '#F43F5E', '#06B6D4', '#6366F1', '#10B981', '#FB923C', '#A855F7'];
 
@@ -18,7 +19,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
         <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
             <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
-            {payload.map(p => <p key={p.dataKey} style={{ color: p.color }}>{p.name}: <strong>{fmtINR(p.value)}</strong></p>)}
+            {payload.filter(p => p.value != null).map(p => <p key={p.name} style={{ color: p.color || p.payload.fill }}>{p.name}: <strong>{p.value > 100 ? fmtINR(p.value) : p.value}</strong></p>)}
         </div>
     );
 };
@@ -31,6 +32,7 @@ export default function DistributionPage() {
     const [categories, setCategories] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [anim, setAnim] = useState(false);
 
     useEffect(() => {
         if (!uploadId) { navigate('/'); return; }
@@ -45,7 +47,14 @@ export default function DistributionPage() {
 
     const catData = categories?.data?.map(c => ({ name: c.category, value: c.total_spend })) || [];
 
-    if (loading) return <div className="loading-overlay"><div className="spinner spinner-lg" /><p>Loading…</p></div>;
+    if (loading) return (
+        <div className="page-body">
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                <Skeleton variant="rounded" height={350} animation="wave" />
+                <Skeleton variant="rounded" height={350} animation="wave" />
+            </Box>
+        </div>
+    );
 
     return (
         <div>
@@ -70,12 +79,12 @@ export default function DistributionPage() {
                             <span className="chip chip-blue">Top {topN}</span>
                         </div>
                         {vendorData.length > 0 ? (
-                            <div className="chart-container" style={{ height: 300 }}>
+                            <div className="chart-container" style={{ height: 350 }}>
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 140 }}>
+                                    <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 10 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                         <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                        <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={140} />
-                                        <Tooltip content={<CustomTooltip />} />
+                                        <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={120} />
+                                        <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                         <Bar dataKey="value" name="Spend (₹)" radius={[0, 4, 4, 0]}>
                                             {vendorData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                                         </Bar>
@@ -94,13 +103,13 @@ export default function DistributionPage() {
                             <span className="chip chip-violet">Top {topN}</span>
                         </div>
                         {catData.length > 0 ? (
-                            <div className="chart-container" style={{ height: 300 }}>
+                            <div className="chart-container" style={{ height: 350 }}>
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
+                                    <PieChart onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                         <Pie data={catData} cx="50%" cy="50%" outerRadius={110} dataKey="value" nameKey="name">
                                             {catData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                                         </Pie>
-                                        <Tooltip content={<CustomTooltip />} />
+                                        <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                         <Legend formatter={(v) => <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{v}</span>} />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -114,7 +123,11 @@ export default function DistributionPage() {
                 {/* Tables */}
                 {vendorData.length > 0 && (
                     <div className="card section-gap animate-fade">
-                        <div className="card-header"><span className="card-title-lg">📊 Vendor Details</span></div>
+                        <div className="card-header">
+                            <span className="card-title-lg" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <Users size={18} /> Vendor Details
+                            </span>
+                        </div>
                         <div className="table-wrap">
                             <table>
                                 <thead><tr><th>#</th><th>Vendor</th><th>Total Spend</th><th>Share</th></tr></thead>
