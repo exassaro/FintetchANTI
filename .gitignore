@@ -1,0 +1,51 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Data Science / Machine Learning
+.ipynb_checkpoints
+mlruns/
+*.pkl
+*.model
+
+# Frontend (Node / Vite / React)
+node_modules/
+.npm
+dist/
+dist-ssr/
+*.local
+
+# Logs, OS files, and databases
+*.sqlite3
+*.log
+.DS_Store
+Thumbs.db
+
+# Storage directory (user generated content / raw CSVs)
+storage/

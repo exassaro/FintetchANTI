@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+.exassaro/
+env/
+
+# Environment variables
+.env
+
+# Storage output files
+storage/raw/*
+storage/classified/*
+!storage/raw/.gitkeep
+!storage/classified/.gitkeep
+
+# MLflow databases
+*.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+.env

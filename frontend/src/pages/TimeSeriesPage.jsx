@@ -1,0 +1,134 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AlertTriangle, Activity } from 'lucide-react';
+import {
+    LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
+    ResponsiveContainer, Legend
+} from 'recharts';
+import { usePipeline } from '../context/PipelineContext';
+import { getTimeSeries } from '../api/analytics';
+
+const fmtINR = (v) =>
+    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
+
+const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    return (
+        <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
+            <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
+            {payload.map(p => <p key={p.dataKey} style={{ color: p.color }}>{p.name}: <strong>{p.value > 1000 ? fmtINR(p.value) : p.value}</strong></p>)}
+        </div>
+    );
+};
+
+const METRICS = [
+    { value: 'total_expenses', label: 'Total Expenses' },
+    { value: 'gst_liability', label: 'GST Liability' },
+    { value: 'itc_eligible_amount', label: 'ITC Eligible Amount' },
+    { value: 'txn_count', label: 'Transaction Count' },
+];
+
+export default function TimeSeriesPage() {
+    const { uploadId } = usePipeline();
+    const navigate = useNavigate();
+    const [metric, setMetric] = useState('total_expenses');
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!uploadId) { navigate('/'); return; }
+        setLoading(true);
+        setError(null);
+        getTimeSeries(uploadId, metric)
+            .then(r => setData(r))
+            .catch(e => setError(e.response?.data?.detail || e.message))
+            .finally(() => setLoading(false));
+    }, [uploadId, metric]);
+
+    const chartData = data?.history?.map(h => ({ month: h.month?.slice(0, 7), value: h.value })) || [];
+
+    return (
+        <div>
+            <div className="page-header">
+                <div className="page-header-left">
+                    <div className="page-breadcrumb">Analytics › Time Series</div>
+                    <h1>Time Series</h1>
+                </div>
+                <select
+                    className="input-field"
+                    style={{ width: 220, marginTop: 8 }}
+                    value={metric}
+                    onChange={e => setMetric(e.target.value)}
+                >
+                    {METRICS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                </select>
+            </div>
+
+            <div className="page-body">
+                {error && <div className="alert alert-error animate-fade"><AlertTriangle size={18} /> {error}</div>}
+
+                <div className="card animate-fade">
+                    <div className="card-header">
+                        <span className="card-title-lg">
+                            <Activity size={16} style={{ display: 'inline', marginRight: 8 }} />
+                            {METRICS.find(m => m.value === metric)?.label} — Monthly Trend
+                        </span>
+                        {data?.meta && (
+                            <span className="chip chip-blue">{data.meta.n_points} data points</span>
+                        )}
+                    </div>
+
+                    {loading ? (
+                        <div className="loading-overlay"><div className="spinner" /></div>
+                    ) : (
+                        <div className="chart-container" style={{ height: 360 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={chartData} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
+                                    <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="4 4" />
+                                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="value"
+                                        name={METRICS.find(m => m.value === metric)?.label}
+                                        stroke="#059669"
+                                        strokeWidth={2.5}
+                                        dot={{ r: 4, fill: '#059669', strokeWidth: 0 }}
+                                        activeDot={{ r: 6, fill: '#047857' }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+                </div>
+
+                {/* Stats */}
+                {chartData.length > 0 && (
+                    <div className="kpi-grid section-gap animate-fade" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
+                        {[
+                            { label: 'Months of Data', value: chartData.length },
+                            { label: 'Peak Month', value: chartData.reduce((a, b) => b.value > a.value ? b : a, chartData[0])?.month || '—' },
+                            { label: 'Peak Value', value: metric.includes('expenses') || metric.includes('liability') || metric.includes('amount') ? fmtINR(Math.max(...chartData.map(d => d.value))) : Math.max(...chartData.map(d => d.value))?.toLocaleString() },
+                            { label: 'Average', value: metric.includes('expenses') || metric.includes('liability') || metric.includes('amount') ? fmtINR(chartData.reduce((s, d) => s + d.value, 0) / chartData.length) : (chartData.reduce((s, d) => s + d.value, 0) / chartData.length).toFixed(0) },
+                        ].map(k => (
+                            <div className="kpi-card" key={k.label}>
+                                <div className="kpi-label">{k.label}</div>
+                                <div className="kpi-value" style={{ fontSize: '1.25rem' }}>{k.value}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {!loading && chartData.length === 0 && (
+                    <div className="empty-state">
+                        <div className="empty-state-icon">📅</div>
+                        <h3>No time-series data</h3>
+                        <p>Ensure your CSV contains a date/transaction_date column.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}

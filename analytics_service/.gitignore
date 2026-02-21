@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.exassaro/
+.venv/
+conda-meta/
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# Storage (very important)
+storage/
+reviewed/
+anomalous/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Plotly cache
+*.html
+
+# Migrations cache (if using Alembic later)
+alembic/versions/__pycache__/
