@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../api/auth';
-import { LogIn, AlertTriangle, Loader2, Shield, Lock, Mail, BarChart2, ShieldCheck, Brain } from 'lucide-react';
+import { LogIn, AlertTriangle, Loader2, Lock, Mail, BarChart2, ShieldCheck, Brain } from 'lucide-react';
+import logoUrl from '../assets/logo.svg';
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -87,14 +88,10 @@ export default function LoginPage() {
                     <div style={{ position: 'relative', zIndex: 1 }}>
                         {/* Logo */}
                         <div style={{
-                            width: 52, height: 52, borderRadius: 14,
-                            background: 'rgba(255,255,255,0.2)',
-                            backdropFilter: 'blur(10px)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
                             marginBottom: 24,
-                            border: '1px solid rgba(255,255,255,0.15)',
                         }}>
-                            <Shield size={26} color="#fff" />
+                            <img src={logoUrl} alt="Logo" style={{ width: 90, height: 90, objectFit: 'contain' }} />
                         </div>
 
                         <h1 style={{
@@ -102,14 +99,14 @@ export default function LoginPage() {
                             letterSpacing: '-0.03em', marginBottom: 8,
                             lineHeight: 1.2,
                         }}>
-                            GSTAnalytica
+                            Auditron
                         </h1>
                         <p style={{
                             fontSize: '0.85rem', opacity: 0.85,
                             lineHeight: 1.6, marginBottom: 36,
                             color: 'rgba(255,255,255,0.85)',
                         }}>
-                            SME Audit Intelligence Platform for Indian GST compliance, anomaly detection, and financial analytics.
+                            Transforming Audits into Strategic Insight with Advanced Intelligence.
                         </p>
 
                         {/* Feature highlights */}

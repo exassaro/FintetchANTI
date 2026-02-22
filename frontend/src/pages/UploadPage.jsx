@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     UploadCloud, CheckCircle, AlertTriangle, Loader2,
-    FileText, ChevronRight, Brain, ShieldAlert, BarChart2, X
+    FileText, ChevronRight, Brain, ShieldAlert, BarChart2, X, Rocket
 } from 'lucide-react';
 import { usePipeline } from '../context/PipelineContext';
 import { uploadCSV } from '../api/classification';
@@ -150,34 +150,36 @@ export default function UploadPage() {
                             </div>
                             <h3>Drop your transaction CSV here</h3>
                             <p>Supports GST transaction files — description, amount, vendor, category, HSN/SAC columns</p>
-                            <button className="btn btn-secondary" onClick={e => { e.stopPropagation(); fileInputRef.current.click(); }}>
-                                <FileText size={16} /> Browse File
-                            </button>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 16 }}>
+                                <button className="btn btn-secondary" onClick={e => { e.stopPropagation(); fileInputRef.current.click(); }}>
+                                    <FileText size={16} /> Browse File
+                                </button>
 
-                            {file && (
-                                <div
-                                    onClick={e => e.stopPropagation()}
-                                    style={{
-                                        marginTop: 20,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: 12,
-                                        background: 'var(--accent-blue-lt)',
-                                        border: '1px solid var(--border-accent)',
-                                        borderRadius: 'var(--radius-md)',
-                                        padding: '10px 16px',
-                                    }}
-                                >
-                                    <FileText size={18} color="var(--accent-blue)" />
-                                    <div style={{ textAlign: 'left' }}>
-                                        <div style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600 }}>{file.name}</div>
-                                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{(file.size / 1024).toFixed(1)} KB</div>
+                                {file && (
+                                    <div
+                                        onClick={e => e.stopPropagation()}
+                                        style={{
+                                            marginTop: 20,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 12,
+                                            background: 'var(--accent-blue-lt)',
+                                            border: '1px solid var(--border-accent)',
+                                            borderRadius: 'var(--radius-md)',
+                                            padding: '10px 16px',
+                                        }}
+                                    >
+                                        <FileText size={18} color="var(--accent-blue)" />
+                                        <div style={{ textAlign: 'left' }}>
+                                            <div style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600 }}>{file.name}</div>
+                                            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{(file.size / 1024).toFixed(1)} KB</div>
+                                        </div>
+                                        <button className="btn btn-icon btn-secondary" onClick={onRemoveFile} style={{ marginLeft: 4 }}>
+                                            <X size={14} />
+                                        </button>
                                     </div>
-                                    <button className="btn btn-icon btn-secondary" onClick={onRemoveFile} style={{ marginLeft: 4 }}>
-                                        <X size={14} />
-                                    </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
 
                         {error && (
@@ -200,7 +202,7 @@ export default function UploadPage() {
                 {(running || allDone) && (
                     <div className="card animate-fade" style={{ marginTop: file && !running ? 24 : 0 }}>
                         <div className="card-header">
-                            <span className="card-title-lg">🚀 Processing Pipeline</span>
+                            <span className="card-title-lg" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Rocket size={18} /> Processing Pipeline</span>
                             {running && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent-blue)', fontSize: '0.82rem' }}>
                                     <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />
@@ -218,10 +220,23 @@ export default function UploadPage() {
                                     <React.Fragment key={step.id}>
                                         <div className={`pipeline-node ${status}`}>
                                             <div className="pipeline-node-circle">
-                                                {status === 'done' && <CheckCircle size={22} color="var(--accent-emerald)" />}
-                                                {status === 'active' && <Loader2 size={22} color="var(--accent-blue)" style={{ animation: 'spin 1s linear infinite' }} />}
-                                                {status === 'error' && <AlertTriangle size={22} color="var(--accent-rose)" />}
-                                                {status === 'idle' && <span style={{ fontSize: '1.3rem' }}>{step.icon}</span>}
+                                                <div className={status === 'active' ? 'icon-pulse' : ''} style={{ display: 'flex', zIndex: 2 }}>
+                                                    {step.icon}
+                                                </div>
+
+                                                {status === 'active' && (
+                                                    <Loader2 size={56} color="var(--accent-blue)" style={{ position: 'absolute', animation: 'spin 2s linear infinite', opacity: 0.25 }} />
+                                                )}
+                                                {status === 'done' && (
+                                                    <div style={{ position: 'absolute', top: -3, right: -3, background: 'var(--bg-primary)', borderRadius: '50%', padding: 2, display: 'flex' }}>
+                                                        <CheckCircle size={14} color="var(--accent-green)" />
+                                                    </div>
+                                                )}
+                                                {status === 'error' && (
+                                                    <div style={{ position: 'absolute', top: -3, right: -3, background: 'var(--bg-primary)', borderRadius: '50%', padding: 2, display: 'flex' }}>
+                                                        <AlertTriangle size={14} color="var(--accent-rose)" />
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="pipeline-node-label">{step.label}</div>
                                         </div>

@@ -9,7 +9,8 @@ import {
     Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
     Button, Snackbar, Alert, Chip, Tooltip, Fade, Skeleton,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, Box, Typography, IconButton, Collapse, LinearProgress
+    Paper, Box, Typography, IconButton, Collapse, LinearProgress,
+    Select, MenuItem
 } from '@mui/material';
 
 const fmtINR = (v) =>
@@ -171,17 +172,29 @@ export default function ReviewPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 8 }}>
                     <Filter size={15} color="var(--text-muted)" />
-                    <select className="input-field" style={{ width: 160 }} value={filterType} onChange={e => setFilterType(e.target.value)}>
-                        <option value="">All Types</option>
-                        <option value="anomaly">Anomaly Flagged</option>
-                        <option value="low_confidence">Low Confidence</option>
-                    </select>
-                    <select className="input-field" style={{ width: 140 }} value={severityFilter} onChange={e => setSeverityFilter(e.target.value)}>
-                        <option value="">All Severities</option>
-                        <option value="high">High Severity</option>
-                        <option value="medium">Medium Severity</option>
-                        <option value="low">Low Severity</option>
-                    </select>
+                    <Select
+                        size="small"
+                        value={filterType}
+                        onChange={e => setFilterType(e.target.value)}
+                        displayEmpty
+                        sx={{ width: 160, height: 32, fontSize: '0.8rem', fontWeight: 600, backgroundColor: '#fff', '& fieldset': { borderColor: '#CBD5E1' }, '&:hover fieldset': { borderColor: '#94A3B8' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
+                    >
+                        <MenuItem value="" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>All Types</MenuItem>
+                        <MenuItem value="anomaly" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>Anomaly Flagged</MenuItem>
+                        <MenuItem value="low_confidence" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>Low Confidence</MenuItem>
+                    </Select>
+                    <Select
+                        size="small"
+                        value={severityFilter}
+                        onChange={e => setSeverityFilter(e.target.value)}
+                        displayEmpty
+                        sx={{ width: 140, height: 32, fontSize: '0.8rem', fontWeight: 600, backgroundColor: '#fff', '& fieldset': { borderColor: '#CBD5E1' }, '&:hover fieldset': { borderColor: '#94A3B8' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
+                    >
+                        <MenuItem value="" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>All Severities</MenuItem>
+                        <MenuItem value="high" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>High Severity</MenuItem>
+                        <MenuItem value="medium" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>Medium Severity</MenuItem>
+                        <MenuItem value="low" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>Low Severity</MenuItem>
+                    </Select>
                     <Button variant="outlined" size="small" onClick={() => loadQueue(true)} sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.78rem' }}>
                         Refresh
                     </Button>
@@ -334,41 +347,45 @@ export default function ReviewPage() {
                                                     <td style={{ textAlign: 'right' }}>
                                                         <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end', alignItems: 'center' }}>
                                                             {row.flag_type === 'low_confidence' && (
-                                                                <select
-                                                                    className="custom-select custom-tooltip"
-                                                                    data-tooltip="Override GST Slab"
-                                                                    style={{ height: 26, width: 68 }}
-                                                                    value={correctedSlabs[row.row_index] ?? row.gst_slab_predicted ?? ''}
-                                                                    onChange={e => setCorrectedSlabs(prev => ({ ...prev, [row.row_index]: Number(e.target.value) }))}
-                                                                >
-                                                                    <option value="0">0%</option>
-                                                                    <option value="5">5%</option>
-                                                                    <option value="18">18%</option>
-                                                                    <option value="40">40%</option>
-                                                                </select>
+                                                                <Tooltip title="Override GST Slab" arrow placement="top">
+                                                                    <Select
+                                                                        size="small"
+                                                                        value={correctedSlabs[row.row_index] ?? row.gst_slab_predicted ?? ''}
+                                                                        onChange={e => setCorrectedSlabs(prev => ({ ...prev, [row.row_index]: Number(e.target.value) }))}
+                                                                        sx={{ height: 26, width: 68, fontSize: '0.75rem', fontWeight: 600, backgroundColor: '#fff', '& fieldset': { borderColor: '#CBD5E1' }, '&:hover fieldset': { borderColor: '#94A3B8' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
+                                                                    >
+                                                                        <MenuItem value={0} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>0%</MenuItem>
+                                                                        <MenuItem value={5} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>5%</MenuItem>
+                                                                        <MenuItem value={18} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>18%</MenuItem>
+                                                                        <MenuItem value={40} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>40%</MenuItem>
+                                                                    </Select>
+                                                                </Tooltip>
                                                             )}
-                                                            <button
-                                                                className={`btn btn-icon custom-tooltip ${pendingDecisions[row.row_index] === 'REJECTED' ? 'btn-success' : 'btn-secondary'}`}
-                                                                data-tooltip="Mark as not an anomaly"
-                                                                onClick={() => markDecision(row.row_index, 'REJECTED')}
-                                                            >
-                                                                <CheckCircle size={14} />
-                                                            </button>
-                                                            <button
-                                                                className={`btn btn-icon custom-tooltip ${pendingDecisions[row.row_index] === 'CONFIRMED' ? 'btn-danger' : 'btn-secondary'}`}
-                                                                data-tooltip="Confirm as anomaly"
-                                                                onClick={() => markDecision(row.row_index, 'CONFIRMED')}
-                                                            >
-                                                                <XCircle size={14} />
-                                                            </button>
-                                                            <button
-                                                                className="btn btn-icon btn-secondary custom-tooltip"
-                                                                style={{ color: expanded === row.row_index ? '#059669' : '' }}
-                                                                data-tooltip="View full details"
-                                                                onClick={() => setExpanded(expanded === row.row_index ? null : row.row_index)}
-                                                            >
-                                                                <Eye size={14} />
-                                                            </button>
+                                                            <Tooltip title="Mark as not an anomaly" arrow placement="top">
+                                                                <button
+                                                                    className={`btn btn-icon ${pendingDecisions[row.row_index] === 'REJECTED' ? 'btn-success' : 'btn-secondary'}`}
+                                                                    onClick={() => markDecision(row.row_index, 'REJECTED')}
+                                                                >
+                                                                    <CheckCircle size={14} />
+                                                                </button>
+                                                            </Tooltip>
+                                                            <Tooltip title="Confirm as anomaly" arrow placement="top">
+                                                                <button
+                                                                    className={`btn btn-icon ${pendingDecisions[row.row_index] === 'CONFIRMED' ? 'btn-danger' : 'btn-secondary'}`}
+                                                                    onClick={() => markDecision(row.row_index, 'CONFIRMED')}
+                                                                >
+                                                                    <XCircle size={14} />
+                                                                </button>
+                                                            </Tooltip>
+                                                            <Tooltip title="View full details" arrow placement="top">
+                                                                <button
+                                                                    className="btn btn-icon btn-secondary"
+                                                                    style={{ color: expanded === row.row_index ? '#059669' : '' }}
+                                                                    onClick={() => setExpanded(expanded === row.row_index ? null : row.row_index)}
+                                                                >
+                                                                    <Eye size={14} />
+                                                                </button>
+                                                            </Tooltip>
                                                         </div>
                                                     </td>
                                                 </tr>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, TrendingUp, Bot, BarChart2, CalendarClock } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Bot, BarChart2, CalendarClock, ClipboardList } from 'lucide-react';
 import {
     ComposedChart, Line, Area, XAxis, YAxis, Tooltip,
     CartesianGrid, ResponsiveContainer, ReferenceLine
@@ -11,6 +11,14 @@ import { Skeleton, Box } from '@mui/material';
 
 const fmtINR = (v) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
+
+const formatYAxis = (tickItem) => {
+    if (typeof tickItem !== 'number') return tickItem;
+    if (tickItem >= 1000000000) return (tickItem / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (tickItem >= 1000000) return (tickItem / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (tickItem >= 1000) return (tickItem / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return tickItem;
+};
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
@@ -137,7 +145,7 @@ export default function ForecastPage() {
                                     </defs>
                                     <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="4 4" />
                                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
                                     <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                     <ReferenceLine x={lastHistoryMonth} stroke="#CBD5E1" strokeDasharray="4 4" label={{ value: 'Forecast →', position: 'insideTopRight', fill: 'var(--text-muted)', fontSize: 11 }} />
                                     {/* Shaded confidence band between lower and upper bounds */}
@@ -158,7 +166,7 @@ export default function ForecastPage() {
                 {forecastData.length > 0 && (
                     <div className="card section-gap animate-fade">
                         <div className="card-header">
-                            <span className="card-title-lg">📋 Forecast Values</span>
+                            <span className="card-title-lg" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><ClipboardList size={18} /> Forecast Values</span>
                         </div>
                         <div className="table-wrap">
                             <table>

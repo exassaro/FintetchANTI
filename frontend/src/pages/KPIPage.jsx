@@ -12,6 +12,14 @@ import { Skeleton, Alert as MuiAlert, Box } from '@mui/material';
 const fmtINR = (v) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
 
+const formatYAxis = (tickItem) => {
+    if (typeof tickItem !== 'number') return tickItem;
+    if (tickItem >= 1000000000) return (tickItem / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (tickItem >= 1000000) return (tickItem / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (tickItem >= 1000) return (tickItem / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return tickItem;
+};
+
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
@@ -110,13 +118,13 @@ export default function KPIPage() {
                 {/* ── Financial Bar Chart ── */}
                 <div className="card section-gap animate-fade">
                     <div className="card-header">
-                        <span className="card-title-lg">💰 Financial Breakdown</span>
+                        <span className="card-title-lg" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IndianRupee size={18} /> Financial Breakdown</span>
                     </div>
                     <div className="chart-container" style={{ height: 240 }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={barData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
                                 <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                 <Bar dataKey="value" name="Amount (₹)" radius={[4, 4, 0, 0]}>
                                     {barData.map((d, i) => <Cell key={i} fill={d.color} />)}

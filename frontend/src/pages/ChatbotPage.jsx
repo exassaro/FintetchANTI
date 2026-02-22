@@ -7,12 +7,12 @@ import {
     Avatar, Chip, IconButton, Tooltip, Paper, Typography,
     Box, Fade, Grow
 } from '@mui/material';
+import logoUrl from '../assets/logo.svg';
 
 const SUGGESTIONS = [
     'What is the total GST liability?',
     'List the top 5 vendors by spend',
     'Which transactions have the highest anomaly score?',
-    'What is the effective tax rate?',
     'How many low confidence transactions are there?',
     'Show me the GST slab distribution',
 ];
@@ -25,7 +25,7 @@ export default function ChatbotPage() {
     const [messages, setMessages] = useState([
         {
             role: 'bot',
-            content: "Hello! I'm your GST Financial Audit Assistant. Ask me anything about your transactions — anomalies, GST liabilities, compliance metrics, or specific vendors.",
+            content: "Hello! I'm Auri, your AI Audit Assistant. Ask me anything about your transactions anomalies, GST liabilities, compliance metrics, or specific vendors.",
             time: new Date(),
         }
     ]);
@@ -83,10 +83,10 @@ export default function ChatbotPage() {
                     <h1 style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <Avatar sx={{
                             width: 32, height: 32,
-                            background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-                            boxShadow: '0 4px 12px rgba(99,102,241,0.25)',
+                            background: 'linear-gradient(135deg, #059669, #10B981)',
+                            boxShadow: '0 4px 12px rgba(5,150,105,0.25)',
                         }}>
-                            <Bot size={18} />
+                            <Bot size={18} color="#fff" />
                         </Avatar>
                         AI Chatbot
                     </h1>
@@ -125,14 +125,13 @@ export default function ChatbotPage() {
                         }}>
                             <Avatar sx={{
                                 width: 38, height: 38,
-                                background: 'linear-gradient(135deg, #059669, #10B981)',
-                                boxShadow: '0 2px 8px rgba(5,150,105,0.25)',
+                                background: 'transparent',
                             }}>
-                                <Bot size={20} />
+                                <img src={logoUrl} alt="Auri Logo" style={{ width: 38, height: 38, objectFit: 'contain' }} />
                             </Avatar>
                             <div>
                                 <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1E293B' }}>
-                                    GST Audit Assistant
+                                    Auri
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                     <Box sx={{
@@ -157,12 +156,12 @@ export default function ChatbotPage() {
                                                 width: 30, height: 30,
                                                 background: msg.role === 'user'
                                                     ? 'rgba(99,102,241,0.15)'
-                                                    : 'linear-gradient(135deg, #059669, #10B981)',
+                                                    : 'transparent',
                                                 border: msg.role === 'user' ? '1px solid rgba(99,102,241,0.25)' : 'none',
                                             }}>
                                                 {msg.role === 'user'
                                                     ? <User size={14} color="#6366F1" />
-                                                    : <Bot size={14} color="#fff" />
+                                                    : <img src={logoUrl} alt="Auri Logo" className="auri-anim" style={{ width: 30, height: 30, objectFit: 'contain' }} />
                                                 }
                                             </Avatar>
                                             <div
@@ -203,9 +202,9 @@ export default function ChatbotPage() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                         <Avatar sx={{
                                             width: 30, height: 30,
-                                            background: 'linear-gradient(135deg, #059669, #10B981)',
+                                            background: 'transparent',
                                         }}>
-                                            <Bot size={14} color="#fff" />
+                                            <img src={logoUrl} alt="Auri Logo" className="auri-anim" style={{ width: 30, height: 30, objectFit: 'contain' }} />
                                         </Avatar>
                                         <div className="chat-bubble bot" style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '12px 16px' }}>
                                             <div style={{ display: 'flex', gap: 4 }}>

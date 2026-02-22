@@ -22,6 +22,14 @@ const SLAB_COLORS = ['#059669', '#3B82F6', '#F59E0B', '#8B5CF6', '#F43F5E', '#06
 const fmtINR = (v) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
 
+const formatYAxis = (tickItem) => {
+    if (typeof tickItem !== 'number') return tickItem;
+    if (tickItem >= 1000000000) return (tickItem / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (tickItem >= 1000000) return (tickItem / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (tickItem >= 1000) return (tickItem / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return tickItem;
+};
+
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
@@ -189,8 +197,8 @@ export default function DashboardPage() {
                                     </linearGradient>
                                 </defs>
                                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                <YAxis yAxisId="left" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                <YAxis yAxisId="left" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
+                                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
                                 <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                 <Area yAxisId="left" type="linear" dataKey="spend" stroke="#059669" fill="url(#spendGrad)" strokeWidth={2} name="Spend (₹)" />
                                 <Area yAxisId="right" type="linear" dataKey="anomalies" stroke="#F43F5E" fill="url(#anomGrad)" strokeWidth={2} name="Anomalies" />
@@ -229,7 +237,7 @@ export default function DashboardPage() {
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={slabSpendData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                     <XAxis dataKey="slab" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
                                     <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                     <Bar dataKey="spend" name="Spend (₹)" radius={[4, 4, 0, 0]}>
                                         {slabSpendData.map((_, i) => <Cell key={i} fill={SLAB_COLORS[i % SLAB_COLORS.length]} />)}

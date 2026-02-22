@@ -24,7 +24,7 @@ export default function Layout() {
     const location = useLocation();
     const { uploadId } = usePipeline();
     const { user, logout } = useAuth();
-    const meta = PAGE_TITLES[location.pathname] || { title: 'GSTAnalytica', sub: '' };
+    const meta = PAGE_TITLES[location.pathname] || { title: 'Auditron', sub: '' };
 
     return (
         <div className="layout">

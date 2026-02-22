@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, BarChart2, Users } from 'lucide-react';
+import { AlertTriangle, BarChart2, Users, Building2, FolderOpen } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
     ResponsiveContainer, PieChart, Pie, Legend
@@ -13,6 +13,14 @@ const COLORS = ['#059669', '#3B82F6', '#F59E0B', '#8B5CF6', '#F43F5E', '#06B6D4'
 
 const fmtINR = (v) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(v);
+
+const formatYAxis = (tickItem) => {
+    if (typeof tickItem !== 'number') return tickItem;
+    if (tickItem >= 1000000000) return (tickItem / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (tickItem >= 1000000) return (tickItem / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (tickItem >= 1000) return (tickItem / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return tickItem;
+};
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
@@ -75,14 +83,14 @@ export default function DistributionPage() {
                     {/* Vendor Distribution */}
                     <div className="card animate-fade">
                         <div className="card-header">
-                            <span className="card-title-lg">🏢 Top Vendors by Spend</span>
+                            <span className="card-title-lg" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Building2 size={18} /> Top Vendors by Spend</span>
                             <span className="chip chip-blue">Top {topN}</span>
                         </div>
                         {vendorData.length > 0 ? (
                             <div className="chart-container" style={{ height: 350 }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 10 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
-                                        <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                        <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
                                         <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={120} />
                                         <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
                                         <Bar dataKey="value" name="Spend (₹)" radius={[0, 4, 4, 0]}>
@@ -92,14 +100,14 @@ export default function DistributionPage() {
                                 </ResponsiveContainer>
                             </div>
                         ) : (
-                            <div className="empty-state"><div className="empty-state-icon">🏢</div><h3>No vendor data</h3><p>Your CSV may not have a vendor_name column.</p></div>
+                            <div className="empty-state"><div className="empty-state-icon" style={{ background: 'transparent', boxShadow: 'none' }}><Building2 size={48} color="var(--text-muted)" /></div><h3>No vendor data</h3><p>Your CSV may not have a vendor_name column.</p></div>
                         )}
                     </div>
 
                     {/* Category Distribution */}
                     <div className="card animate-fade">
                         <div className="card-header">
-                            <span className="card-title-lg">📂 Top Categories by Spend</span>
+                            <span className="card-title-lg" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FolderOpen size={18} /> Top Categories by Spend</span>
                             <span className="chip chip-violet">Top {topN}</span>
                         </div>
                         {catData.length > 0 ? (
@@ -115,7 +123,7 @@ export default function DistributionPage() {
                                 </ResponsiveContainer>
                             </div>
                         ) : (
-                            <div className="empty-state"><div className="empty-state-icon">📂</div><h3>No category data</h3><p>Your CSV may not have a category column.</p></div>
+                            <div className="empty-state"><div className="empty-state-icon" style={{ background: 'transparent', boxShadow: 'none' }}><FolderOpen size={48} color="var(--text-muted)" /></div><h3>No category data</h3><p>Your CSV may not have a category column.</p></div>
                         )}
                     </div>
                 </div>

@@ -207,16 +207,16 @@ pre {
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-md);
-  background: var(--gradient-primary);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
   flex-shrink: 0;
-  box-shadow: var(--shadow-green);
+  box-shadow: none;
 }
 
 .logo-text {
@@ -762,6 +762,25 @@ pre {
   justify-content: center;
   transition: all var(--transition);
   font-size: 1rem;
+  position: relative;
+}
+
+@keyframes icon-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-pulse {
+  animation: icon-pulse 1.5s ease-in-out infinite;
 }
 
 .pipeline-node.done .pipeline-node-circle {
@@ -1414,4 +1433,22 @@ hr {
   .kpi-grid {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+@keyframes auri-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.auri-anim {
+  animation: auri-pulse 2.5s ease-in-out infinite;
 }

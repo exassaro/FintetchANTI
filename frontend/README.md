@@ -1,4 +1,4 @@
-# 🇮🇳 GSTAnalytica — Frontend
+# 🇮🇳 Auditron — Frontend
 
 Premium React.js dashboard for the GST Analytics Platform. Orchestrates the full **Classification → Anomaly Detection → Analytics** pipeline.
 

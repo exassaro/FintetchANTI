@@ -2,8 +2,9 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
     UploadCloud, LayoutDashboard, TrendingUp, BarChart2,
-    MessageSquare, Eye, Activity, Zap, Shield
+    MessageSquare, Eye, Activity, Zap, Bot
 } from 'lucide-react';
+import logoUrl from '../assets/logo.svg';
 import { usePipeline } from '../context/PipelineContext';
 import { Tooltip, Chip, Box, Typography, LinearProgress, Fade } from '@mui/material';
 
@@ -28,7 +29,7 @@ const navItems = [
         section: 'Review & AI',
         items: [
             { to: '/review', icon: Eye, label: 'Review Queue', requiresStage: 'detected' },
-            { to: '/chatbot', icon: MessageSquare, label: 'AI Chatbot', requiresStage: 'detected' },
+            { to: '/chatbot', icon: Bot, label: 'AI Chatbot', requiresStage: 'detected' },
         ]
     }
 ];
@@ -63,9 +64,9 @@ export default function Sidebar() {
         <aside className="sidebar">
             <div className="sidebar-logo">
                 <div className="logo-mark">
-                    <div className="logo-icon"><Shield size={20} color="#fff" /></div>
+                    <div className="logo-icon"><img src={logoUrl} alt="Logo" style={{ width: 48, height: 48, objectFit: 'contain' }} /></div>
                     <div className="logo-text">
-                        <span className="logo-name">GSTAnalytica</span>
+                        <span className="logo-name">Auditron</span>
                         <span className="logo-tagline">SME Audit Platform</span>
                     </div>
                 </div>
