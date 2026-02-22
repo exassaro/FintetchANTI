@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { usePipeline } from '../context/PipelineContext';
 import { useAuth } from '../context/AuthContext';
 import {
     AppBar, Toolbar, Typography, Chip, Button, Avatar,
-    Tooltip, Divider, Box, Fade
+    Tooltip, Divider, Box, Fade, IconButton
 } from '@mui/material';
-import { LogOut, User, Zap } from 'lucide-react';
+import { LogOut, User, Zap, Moon, Sun } from 'lucide-react';
 
 const PAGE_TITLES = {
     '/': { title: 'Upload & Process', sub: 'Pipeline' },
@@ -26,6 +26,17 @@ export default function Layout() {
     const { user, logout } = useAuth();
     const meta = PAGE_TITLES[location.pathname] || { title: 'Auditron', sub: '' };
 
+    const [isDark, setIsDark] = useState(() => {
+        return localStorage.getItem('app-theme') === 'dark' || document.documentElement.getAttribute('data-theme') === 'dark';
+    });
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('app-theme', isDark ? 'dark' : 'light');
+    }, [isDark]);
+
+    const toggleTheme = () => setIsDark(!isDark);
+
     return (
         <div className="layout">
             <Sidebar />
@@ -35,9 +46,9 @@ export default function Layout() {
                     position="sticky"
                     elevation={0}
                     sx={{
-                        background: '#FFFFFF',
-                        borderBottom: '1px solid #E2E8F0',
-                        color: '#1E293B',
+                        background: 'var(--bg-secondary)',
+                        borderBottom: '1px solid var(--border)',
+                        color: 'var(--text-primary)',
                         zIndex: 50,
                     }}
                 >
@@ -48,15 +59,15 @@ export default function Layout() {
                                 variant="caption"
                                 sx={{
                                     fontWeight: 700, textTransform: 'uppercase',
-                                    letterSpacing: '0.08em', color: '#94A3B8', fontSize: '0.69rem',
+                                    letterSpacing: '0.08em', color: 'var(--text-muted)', fontSize: '0.69rem',
                                 }}
                             >
                                 {meta.sub}
                             </Typography>
-                            <Typography sx={{ color: '#D1D5DB', fontSize: '0.8rem', lineHeight: 1, mx: 0.3 }}>›</Typography>
+                            <Typography sx={{ color: 'var(--border-strong)', fontSize: '0.8rem', lineHeight: 1, mx: 0.3 }}>›</Typography>
                             <Typography
                                 variant="subtitle1"
-                                sx={{ fontWeight: 650, color: '#1E293B', fontSize: '0.875rem' }}
+                                sx={{ fontWeight: 650, color: 'var(--text-primary)', fontSize: '0.875rem' }}
                             >
                                 {meta.title}
                             </Typography>
@@ -124,9 +135,9 @@ export default function Layout() {
                                             </Box>
                                         }
                                         sx={{
-                                            background: '#F7FAF8',
-                                            border: '1px solid #E2E8F0',
-                                            color: '#475569',
+                                            background: 'var(--bg-primary)',
+                                            border: '1px solid var(--border)',
+                                            color: 'var(--text-secondary)',
                                             fontWeight: 500,
                                             fontSize: '0.78rem',
                                             height: 30,
@@ -142,22 +153,38 @@ export default function Layout() {
                                     onClick={logout}
                                     startIcon={<LogOut size={13} />}
                                     sx={{
-                                        borderColor: '#E2E8F0',
-                                        color: '#94A3B8',
+                                        borderColor: 'var(--border)',
+                                        color: 'var(--text-muted)',
                                         fontWeight: 500,
                                         fontSize: '0.75rem',
                                         textTransform: 'none',
                                         minWidth: 'auto',
                                         px: 1.5, py: 0.4,
                                         '&:hover': {
-                                            borderColor: '#F43F5E',
-                                            color: '#F43F5E',
-                                            background: '#FFF1F2',
+                                            borderColor: 'var(--accent-rose)',
+                                            color: 'var(--accent-rose)',
+                                            background: 'var(--accent-rose-lt)',
                                         },
                                     }}
                                 >
                                     Sign Out
                                 </Button>
+                            </Tooltip>
+
+                            <Tooltip title="Toggle Dark Theme" arrow placement="bottom">
+                                <IconButton
+                                    onClick={toggleTheme}
+                                    size="small"
+                                    sx={{
+                                        ml: 0.5,
+                                        backgroundColor: 'var(--bg-card)',
+                                        border: '1px solid var(--border)',
+                                        transition: 'all 0.2s',
+                                        '&:hover': { backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-hover)' }
+                                    }}
+                                >
+                                    {isDark ? <Sun size={18} color="var(--accent-amber)" /> : <Moon size={18} color="var(--text-muted)" />}
+                                </IconButton>
                             </Tooltip>
                         </Box>
                     </Toolbar>

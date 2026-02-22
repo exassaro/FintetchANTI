@@ -30,9 +30,9 @@ class ScoreCombiner:
         confidence_reasons: pd.Series = None,
     ):
 
-        # -------------------------------------------
-        # 1️⃣ Safe Initialization
-        # -------------------------------------------
+        
+        # Safe Initialization
+        
 
         n = len(
             numeric_score
@@ -55,9 +55,9 @@ class ScoreCombiner:
         nlp_score = nlp_score.clip(0, 1)
         confidence_score = confidence_score.clip(0, 1)
 
-        # -------------------------------------------
-        # 2️⃣ Composite Score
-        # -------------------------------------------
+        
+        # Composite Score
+        
 
         anomaly_score = (
             self.numeric_weight * numeric_score +
@@ -65,9 +65,9 @@ class ScoreCombiner:
             self.confidence_weight * confidence_score
         ).clip(0, 1)
 
-        # -------------------------------------------
-        # 3️⃣ Adaptive Thresholding
-        # -------------------------------------------
+        
+        # Adaptive Thresholding
+        
 
         # Default to the minimum absolute threshold (e.g., 0.40)
         threshold = float(self.min_absolute_threshold)
@@ -79,9 +79,9 @@ class ScoreCombiner:
 
         is_anomaly = (anomaly_score >= threshold).astype(bool)
 
-        # -------------------------------------------
-        # 4️⃣ Reason Aggregation
-        # -------------------------------------------
+        
+        # Reason Aggregation
+        
 
         combined_reasons = []
 
@@ -109,9 +109,10 @@ class ScoreCombiner:
 
             combined_reasons.append("; ".join(reasons))
 
-        # -------------------------------------------
-        # 5️⃣ Return Structured Output
-        # -------------------------------------------
+        
+        
+        # Return Structured Output
+        
 
         result_df = pd.DataFrame({
             "anomaly_score": anomaly_score,

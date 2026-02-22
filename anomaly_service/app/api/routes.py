@@ -13,18 +13,17 @@ router = APIRouter(prefix="/anomaly", tags=["Anomaly"])
 @router.post("/run/{upload_id}")
 def run_anomaly(upload_id: str, db: Session = Depends(get_db)):
 
-    # ----------------------------------------
-    # 1️⃣ Validate UUID
-    # ----------------------------------------
+    # Validate UUID
+    
 
     try:
         upload_uuid = uuid.UUID(upload_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid upload_id")
 
-    # ----------------------------------------
-    # 2️⃣ Prevent Duplicate Runs (Optional but Recommended)
-    # ----------------------------------------
+
+    # Prevent Duplicate Runs
+
 
     existing = db.query(AnomalyRun)\
         .filter_by(upload_id=upload_uuid)\
@@ -50,9 +49,9 @@ def run_anomaly(upload_id: str, db: Session = Depends(get_db)):
     #         "threshold_used": existing.threshold_used
     #     }
 
-    # ----------------------------------------
-    # 3️⃣ Create New AnomalyRun Record
-    # ----------------------------------------
+
+    # Create New AnomalyRun Record
+
 
     run = AnomalyRun(
         upload_id=upload_uuid,
@@ -65,9 +64,9 @@ def run_anomaly(upload_id: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(run)
 
-    # ----------------------------------------
-    # 4️⃣ Call Orchestrator (IMPORTANT FIX)
-    # ----------------------------------------
+
+    # Call Orchestrator
+
 
     result = run_anomaly_pipeline(upload_id, db)
 

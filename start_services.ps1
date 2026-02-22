@@ -13,7 +13,7 @@ if (-not $condaBase) {
 }
 $condaHook = "$condaBase\shell\condabin\conda-hook.ps1"
 
-Write-Host "=== GSTAnalytica: Starting Backend Microservices ===" -ForegroundColor Cyan
+Write-Host "=== Auditron: Starting Backend Microservices ===" -ForegroundColor Cyan
 Write-Host "Conda env : $condaEnv" -ForegroundColor DarkCyan
 Write-Host "Conda base: $condaBase" -ForegroundColor DarkGray
 Write-Host ""

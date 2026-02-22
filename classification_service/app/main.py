@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import logging
+from app.core.logging import setup_logging
 from app.api.routes import router
 from app.db.base import Base
 from app.db.session import engine
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="GST Classification Service",

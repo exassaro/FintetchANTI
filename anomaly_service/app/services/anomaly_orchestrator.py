@@ -24,9 +24,9 @@ from app.services.score_combiner import ScoreCombiner
 
 def run_anomaly_pipeline(upload_id: str, db: Session):
 
-    # -----------------------------------------------------
-    # 1️⃣ Fetch anomaly run record
-    # -----------------------------------------------------
+
+    # Fetch anomaly run record
+
 
     run = db.query(AnomalyRun)\
         .filter_by(upload_id=upload_id)\
@@ -40,9 +40,8 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
 
     try:
 
-        # -------------------------------------------------
-        # 2️⃣ Fetch Classified File Path from Upload table
-        # -------------------------------------------------
+    
+        # Fetch Classified File Path from Upload table
 
         upload = db.query(Upload)\
             .filter_by(id=upload_id)\
@@ -63,9 +62,9 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
 
         df = pd.read_csv(classified_file)
 
-        # -------------------------------------------------
-        # 3️⃣ Run Detectors
-        # -------------------------------------------------
+
+        # Run Detectors
+        
 
         numeric_detector = NumericDetector()
         text_detector = TextDetector()
@@ -75,9 +74,9 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
         nlp_score, nlp_reasons = text_detector.run(df)
         confidence_score, confidence_reasons = confidence_flagger.run(df)
 
-        # -------------------------------------------------
-        # 4️⃣ Combine Scores (Adaptive Threshold inside)
-        # -------------------------------------------------
+
+        # Combine Scores (Adaptive Threshold inside)
+        
 
         combiner = ScoreCombiner()
 
@@ -90,18 +89,20 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
             confidence_reasons=confidence_reasons,
         )
 
-        # -------------------------------------------------
-        # 5️⃣ Attach Results to DataFrame
-        # -------------------------------------------------
 
+        # Attach Results to DataFrame
+        
         df["numeric_score"] = numeric_score
         df["nlp_score"] = nlp_score
         df["confidence_score"] = confidence_score
         df["anomaly_score"] = result_df["anomaly_score"]
 
+
+
         # If the user uploaded a CSV with a ground-truth 'is_anomaly' column,
         # respect their labels (useful for testing/capstone datasets).
         if "is_anomaly" in df.columns:
+            
             # Safely cast user labels to boolean
             df["is_anomaly"] = df["is_anomaly"].apply(
                 lambda x: str(x).strip().lower() == "true" if isinstance(x, str) else bool(x)
@@ -116,9 +117,9 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
 
         threshold_used = result_df["adaptive_threshold_used"].iloc[0]
 
-        # -------------------------------------------------
-        # 6️⃣ Save Anomaly CSV
-        # -------------------------------------------------
+   
+        # Save Anomaly CSV
+    
 
         os.makedirs(ANOMALY_STORAGE_PATH, exist_ok=True)
 
@@ -129,24 +130,24 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
 
         df.to_csv(anomaly_file_path, index=False)
 
-        # -------------------------------------------------
-        # 7️⃣ Clear Existing Records (If Re-run)
-        # -------------------------------------------------
+
+        # Clear Existing Records (If Re-run)
+
 
         db.query(AnomalyRecord)\
             .filter_by(anomaly_run_id=run.id)\
             .delete()
         db.commit()
 
-        # -------------------------------------------------
-        # 8️⃣ Insert Row-Level Records
-        # -------------------------------------------------
+
+        # Insert Row-Level Records
+
 
         insert_anomaly_records(db, run.id, df)
 
-        # -------------------------------------------------
-        # 9️⃣ Update Run Metadata
-        # -------------------------------------------------
+
+        # Update Run Metadata
+
 
         run.anomaly_file_path = anomaly_file_path
         run.total_records = len(df)
@@ -164,9 +165,9 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
 
         db.commit()
 
-        # -------------------------------------------------
-        # 🔟 Return Summary
-        # -------------------------------------------------
+
+        # Return Summary
+
 
         return {
             "status": STATUS_COMPLETED,
@@ -184,9 +185,9 @@ def run_anomaly_pipeline(upload_id: str, db: Session):
         raise e
 
 
-# ==========================================================
+
 # Batch Insert Function
-# ==========================================================
+
 
 def insert_anomaly_records(
     db: Session,

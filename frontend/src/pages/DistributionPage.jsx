@@ -46,8 +46,12 @@ export default function DistributionPage() {
         if (!uploadId) { navigate('/'); return; }
         setLoading(true);
         Promise.all([getVendorDistribution(uploadId, topN), getCategoryDistribution(uploadId, topN)])
-            .then(([v, c]) => { setVendors(v); setCategories(c); })
-            .catch(e => setError(e.response?.data?.detail || e.message))
+            .then(([v, c]) => {
+                setVendors(v);
+                setCategories(c);
+                setError(null);
+            })
+            .catch(e => setError(e.response?.data?.detail || e.response?.data || e.message))
             .finally(() => setLoading(false));
     }, [uploadId, topN]);
 
@@ -100,7 +104,11 @@ export default function DistributionPage() {
                                 </ResponsiveContainer>
                             </div>
                         ) : (
-                            <div className="empty-state"><div className="empty-state-icon" style={{ background: 'transparent', boxShadow: 'none' }}><Building2 size={48} color="var(--text-muted)" /></div><h3>No vendor data</h3><p>Your CSV may not have a vendor_name column.</p></div>
+                            <div className="chart-container" style={{ height: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.6 }}>
+                                <Building2 size={48} color="var(--text-muted)" style={{ marginBottom: 16 }} />
+                                <h3>No vendor data</h3>
+                                <p style={{ color: 'var(--text-muted)' }}>Your CSV may not have a vendor_name column.</p>
+                            </div>
                         )}
                     </div>
 
@@ -123,7 +131,11 @@ export default function DistributionPage() {
                                 </ResponsiveContainer>
                             </div>
                         ) : (
-                            <div className="empty-state"><div className="empty-state-icon" style={{ background: 'transparent', boxShadow: 'none' }}><FolderOpen size={48} color="var(--text-muted)" /></div><h3>No category data</h3><p>Your CSV may not have a category column.</p></div>
+                            <div className="chart-container" style={{ height: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.6 }}>
+                                <FolderOpen size={48} color="var(--text-muted)" style={{ marginBottom: 16 }} />
+                                <h3>No category data</h3>
+                                <p style={{ color: 'var(--text-muted)' }}>Your CSV may not have a category column.</p>
+                            </div>
                         )}
                     </div>
                 </div>

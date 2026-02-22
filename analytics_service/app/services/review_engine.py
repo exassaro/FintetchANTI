@@ -202,10 +202,14 @@ class ReviewEngine:
             anomaly_file_path
         )
 
+        is_anomaly = df.get("is_anomaly", pd.Series([False] * len(df)))
+        gst_conf = df.get("gst_confidence", pd.Series([1.0] * len(df)))
+        gst_margin = df.get("gst_confidence_margin", pd.Series([1.0] * len(df)))
+
         mask = (
-            (df["is_anomaly"] == True)
-            | (df["gst_confidence"] < settings.LOW_CONFIDENCE_THRESHOLD)
-            | (df["gst_confidence_margin"] < settings.LOW_MARGIN_THRESHOLD)
+            (is_anomaly == True)
+            | (gst_conf < settings.LOW_CONFIDENCE_THRESHOLD)
+            | (gst_margin < settings.LOW_MARGIN_THRESHOLD)
         )
 
         review_df = df[mask].copy()
@@ -226,11 +230,9 @@ class ReviewEngine:
         )
 
         if filter_type == "anomaly":
-            review_df = review_df[review_df["is_anomaly"] == True]
+            review_df = review_df[review_df.get("is_anomaly", pd.Series([False] * len(review_df))) == True]
         elif filter_type == "low_confidence":
-            review_df = review_df[review_df["is_anomaly"] != True]
+            review_df = review_df[review_df.get("is_anomaly", pd.Series([False] * len(review_df))) != True]
 
-        # Replace NaN values with None for compliant JSON serialization
-        review_df = review_df.where(pd.notna(review_df), None)
-
-        return review_df.to_dict(orient="records")
+        import json
+        return json.loads(review_df.to_json(orient="records"))

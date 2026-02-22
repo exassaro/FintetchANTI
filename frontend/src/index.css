@@ -701,15 +701,15 @@ pre {
   text-align: center;
   cursor: pointer;
   transition: all var(--transition);
-  background: #F0FDF4;
+  background: var(--bg-glass);
   position: relative;
 }
 
 .upload-zone:hover,
 .upload-zone.drag-over {
   border-color: var(--accent-green);
-  background: #DCFCE7;
-  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.08);
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 0 4px var(--accent-green-lt);
 }
 
 .upload-zone-icon {
@@ -878,19 +878,19 @@ pre {
 
 .chip-blue {
   background: var(--accent-blue-lt);
-  color: var(--accent-blue-dk);
+  color: var(--accent-blue);
   border: 1px solid var(--accent-blue-border);
 }
 
 .chip-red {
   background: var(--accent-rose-lt);
-  color: #BE123C;
+  color: var(--accent-rose);
   border: 1px solid var(--accent-rose-border);
 }
 
 .chip-amber {
   background: var(--accent-amber-lt);
-  color: #92400E;
+  color: var(--accent-amber);
   border: 1px solid var(--accent-amber-border);
 }
 
@@ -1451,4 +1451,61 @@ hr {
 
 .auri-anim {
   animation: auri-pulse 2.5s ease-in-out infinite;
+}
+
+/* ── Dark Mode Overrides ─────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --bg-card: #242424;
+  --bg-card-hover: #2A2A2A;
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --bg-glass-hover: rgba(255, 255, 255, 0.08);
+
+  --sidebar-bg: #1E1E1E;
+  --sidebar-border-r: #2A2A2A;
+  --sidebar-hover: #2A2A2A;
+  --sidebar-active-bg: rgba(5, 150, 105, 0.15);
+  --sidebar-active-border: #059669;
+  --sidebar-text: #94A3B8;
+  --sidebar-text-active: #10B981;
+  --sidebar-section: #64748B;
+  --sidebar-logo-border: #2A2A2A;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #64748B;
+  --text-inverse: #1E293B;
+
+  --border: #334155;
+  --border-hover: #475569;
+  --border-strong: #64748B;
+
+  --accent-green-lt: rgba(5, 150, 105, 0.15);
+  --accent-rose-lt: rgba(244, 63, 94, 0.15);
+  --accent-amber-lt: rgba(245, 158, 11, 0.15);
+  --accent-blue-lt: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] table th {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+}
+
+[data-theme="dark"] table td {
+  border-bottom: 1px solid var(--border) !important;
+}
+
+[data-theme="dark"] .MuiPaper-root {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .MuiMenuItem-root {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .MuiSelect-select {
+  color: var(--text-primary) !important;
 }

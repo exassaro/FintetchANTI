@@ -10,7 +10,7 @@ import {
     Button, Snackbar, Alert, Chip, Tooltip, Fade, Skeleton,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, Box, Typography, IconButton, Collapse, LinearProgress,
-    Select, MenuItem
+    Select, MenuItem, TablePagination
 } from '@mui/material';
 
 const fmtINR = (v) =>
@@ -29,6 +29,9 @@ export default function ReviewPage() {
     const [filterType, setFilterType] = useState('');
     const [severityFilter, setSeverityFilter] = useState('');
 
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
     const [pendingDecisions, setPendingDecisions] = useState({});
     const [correctedSlabs, setCorrectedSlabs] = useState({});
 
@@ -46,7 +49,10 @@ export default function ReviewPage() {
         setLoading(true);
         setError(null);
         getReviewQueue(uploadId, filterType || null)
-            .then(r => setQueue(r.records || r.queue || []))
+            .then(r => {
+                setQueue(r.records || r.queue || []);
+                setPage(0);
+            })
             .catch(e => setError(e.response?.data?.detail || e.message))
             .finally(() => setLoading(false));
     }, [uploadId, filterType]);
@@ -101,9 +107,9 @@ export default function ReviewPage() {
     };
 
     const scoreBg = (score) => {
-        if (score >= 0.75) return 'rgba(244, 63, 94, 0.06)';
-        if (score >= 0.5) return 'rgba(245, 158, 11, 0.05)';
-        return 'rgba(16, 185, 129, 0.05)';
+        if (score >= 0.75) return 'var(--accent-rose-lt)';
+        if (score >= 0.5) return 'var(--accent-amber-lt)';
+        return 'var(--accent-green-lt)';
     };
 
     const filteredQueue = queue.filter(r => {
@@ -114,6 +120,19 @@ export default function ReviewPage() {
         if (severityFilter === 'low') return score < 0.5;
         return true;
     });
+
+    const paginatedQueue = rowsPerPage > 0
+        ? filteredQueue.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        : filteredQueue;
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     return (
         <div>
@@ -175,9 +194,9 @@ export default function ReviewPage() {
                     <Select
                         size="small"
                         value={filterType}
-                        onChange={e => setFilterType(e.target.value)}
+                        onChange={e => { setFilterType(e.target.value); setPage(0); }}
                         displayEmpty
-                        sx={{ width: 160, height: 32, fontSize: '0.8rem', fontWeight: 600, backgroundColor: '#fff', '& fieldset': { borderColor: '#CBD5E1' }, '&:hover fieldset': { borderColor: '#94A3B8' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
+                        sx={{ width: 160, height: 32, fontSize: '0.8rem', fontWeight: 600, backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', '& fieldset': { borderColor: 'var(--border)' }, '&:hover fieldset': { borderColor: 'var(--border-strong)' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
                     >
                         <MenuItem value="" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>All Types</MenuItem>
                         <MenuItem value="anomaly" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>Anomaly Flagged</MenuItem>
@@ -186,9 +205,9 @@ export default function ReviewPage() {
                     <Select
                         size="small"
                         value={severityFilter}
-                        onChange={e => setSeverityFilter(e.target.value)}
+                        onChange={e => { setSeverityFilter(e.target.value); setPage(0); }}
                         displayEmpty
-                        sx={{ width: 140, height: 32, fontSize: '0.8rem', fontWeight: 600, backgroundColor: '#fff', '& fieldset': { borderColor: '#CBD5E1' }, '&:hover fieldset': { borderColor: '#94A3B8' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
+                        sx={{ width: 140, height: 32, fontSize: '0.8rem', fontWeight: 600, backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', '& fieldset': { borderColor: 'var(--border)' }, '&:hover fieldset': { borderColor: 'var(--border-strong)' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
                     >
                         <MenuItem value="" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>All Severities</MenuItem>
                         <MenuItem value="high" sx={{ fontSize: '0.8rem', fontWeight: 500 }}>High Severity</MenuItem>
@@ -247,7 +266,7 @@ export default function ReviewPage() {
 
                 {/* Queue Table */}
                 {loading ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 450, gap: 2, background: '#fff', borderRadius: 2, border: '1px solid var(--border)' }} className="animate-fade">
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 450, gap: 2, background: 'var(--bg-card)', borderRadius: 2, border: '1px solid var(--border)' }} className="animate-fade">
                         <div style={{ display: 'flex', position: 'relative', alignItems: 'center', justifyContent: 'center', width: 90, height: 90 }}>
                             <div className="custom-spin-wrapper" style={{ position: 'absolute' }}>
                                 <Loader2 size={80} color="var(--accent-blue)" />
@@ -256,7 +275,7 @@ export default function ReviewPage() {
                                 <Search size={34} color="var(--accent-indigo)" />
                             </div>
                         </div>
-                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#1E293B', mt: 2 }}>Analyzing Transactions...</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--text-primary)', mt: 2 }}>Analyzing Transactions...</Typography>
                         <Typography variant="body2" sx={{ color: '#64748B', maxWidth: 350, textAlign: 'center', lineHeight: 1.6 }}>We are deeply cross-referencing your financial data against expected GST slabs and multi-signal fraud models. Hang tight.</Typography>
                     </Box>
                 ) : queue.length === 0 ? (
@@ -278,7 +297,7 @@ export default function ReviewPage() {
                 ) : (
                     <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                         <div className="table-wrap">
-                            <table>
+                            <table >
                                 <thead>
                                     <tr>
                                         <th style={{ width: 70 }}>Score</th>
@@ -291,7 +310,7 @@ export default function ReviewPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredQueue.map((row, idx) => {
+                                    {paginatedQueue.map((row, idx) => {
                                         const score = row.anomaly_score ?? 0;
                                         const isPending = !!pendingDecisions[row.row_index];
 
@@ -309,7 +328,7 @@ export default function ReviewPage() {
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <div style={{ fontWeight: 600, color: '#1E293B', marginBottom: 2 }}>
+                                                        <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
                                                             {row.description || row.vendor_name || `Transaction #${row.row_index}`}
                                                         </div>
                                                         {row.transaction_date && (
@@ -339,7 +358,7 @@ export default function ReviewPage() {
                                                     </td>
                                                     <td>
                                                         {isPending && (
-                                                            <span className="chip" style={{ background: '#1E293B', color: '#fff' }}>
+                                                            <span className={`chip ${pendingDecisions[row.row_index] === 'CONFIRMED' ? 'chip-red' : 'chip-green'}`}>
                                                                 {pendingDecisions[row.row_index] === 'CONFIRMED' ? 'Flagging' : 'Clearing'}
                                                             </span>
                                                         )}
@@ -352,12 +371,12 @@ export default function ReviewPage() {
                                                                         size="small"
                                                                         value={correctedSlabs[row.row_index] ?? row.gst_slab_predicted ?? ''}
                                                                         onChange={e => setCorrectedSlabs(prev => ({ ...prev, [row.row_index]: Number(e.target.value) }))}
-                                                                        sx={{ height: 26, width: 68, fontSize: '0.75rem', fontWeight: 600, backgroundColor: '#fff', '& fieldset': { borderColor: '#CBD5E1' }, '&:hover fieldset': { borderColor: '#94A3B8' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
+                                                                        sx={{ height: 26, width: 68, fontSize: '0.65rem', fontWeight: 600, backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', '& fieldset': { borderColor: 'var(--border)' }, '&:hover fieldset': { borderColor: 'var(--border-strong)' }, '&.Mui-focused fieldset': { borderColor: 'var(--accent-green) !important', borderWidth: '1px !important', boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.15)' } }}
                                                                     >
-                                                                        <MenuItem value={0} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>0%</MenuItem>
-                                                                        <MenuItem value={5} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>5%</MenuItem>
-                                                                        <MenuItem value={18} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>18%</MenuItem>
-                                                                        <MenuItem value={40} sx={{ fontSize: '0.75rem', fontWeight: 500 }}>40%</MenuItem>
+                                                                        <MenuItem value={0} sx={{ fontSize: '0.65rem', fontWeight: 500 }}>0%</MenuItem>
+                                                                        <MenuItem value={5} sx={{ fontSize: '0.65rem', fontWeight: 500 }}>5%</MenuItem>
+                                                                        <MenuItem value={18} sx={{ fontSize: '0.65rem', fontWeight: 500 }}>18%</MenuItem>
+                                                                        <MenuItem value={40} sx={{ fontSize: '0.65rem', fontWeight: 500 }}>40%</MenuItem>
                                                                     </Select>
                                                                 </Tooltip>
                                                             )}
@@ -392,8 +411,8 @@ export default function ReviewPage() {
 
                                                 {/* Expanded details row */}
                                                 {expanded === row.row_index && (
-                                                    <tr style={{ background: '#F8FAFC' }}>
-                                                        <td colSpan={7} style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0' }}>
+                                                    <tr style={{ background: 'var(--bg-primary)' }}>
+                                                        <td colSpan={7} style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
                                                             <div className="card-glass">
                                                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
                                                                     {Object.entries(row)
@@ -405,16 +424,16 @@ export default function ReviewPage() {
                                                                         .map(([k, v]) => (
                                                                             <div key={k}>
                                                                                 <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#94A3B8', fontWeight: 700, marginBottom: 2 }}>{k}</div>
-                                                                                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1E293B' }}>{typeof v === 'number' ? v.toLocaleString() : String(v ?? '—')}</div>
+                                                                                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{typeof v === 'number' ? v.toLocaleString() : String(v ?? '—')}</div>
                                                                             </div>
                                                                         ))}
                                                                 </div>
                                                                 {row.anomaly_reasons && (
-                                                                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #E2E8F0' }}>
+                                                                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed var(--border)' }}>
                                                                         <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F43F5E', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                                                                             <AlertTriangle size={14} /> Anomaly Reasons
                                                                         </div>
-                                                                        <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.82rem', color: '#475569', lineHeight: 1.6 }}>
+                                                                        <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                                                                             {(Array.isArray(row.anomaly_reasons) ? row.anomaly_reasons : [row.anomaly_reasons]).map((r, i) => (
                                                                                 <li key={i}>{r}</li>
                                                                             ))}
@@ -431,6 +450,21 @@ export default function ReviewPage() {
                                 </tbody>
                             </table>
                         </div>
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25, 50, 100, { label: 'All', value: -1 }]}
+                            component="div"
+                            count={filteredQueue.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            sx={{
+                                borderTop: '1px solid var(--border)',
+                                backgroundColor: 'var(--bg-primary)',
+                                color: 'var(--text-primary)',
+                                '& .MuiTablePagination-selectIcon': { color: 'var(--text-muted)' }
+                            }}
+                        />
                     </div>
                 )}
             </div>

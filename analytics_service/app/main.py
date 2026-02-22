@@ -1,9 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import logging
+from app.core.logging import setup_logging
 
 from app.db.base import Base
 from app.db.session import engine
 from app.api import forecast, review, dashboard, time_series, kpi, chatbot, distribution
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="GST Analytics Service",

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../api/auth';
-import { LogIn, AlertTriangle, Loader2, Lock, Mail, BarChart2, ShieldCheck, Brain } from 'lucide-react';
+import { LogIn, AlertTriangle, Loader2, Lock, Mail, BarChart2, ShieldCheck, Brain, Sun, Moon } from 'lucide-react';
+import { IconButton, Tooltip } from '@mui/material';
 import logoUrl from '../assets/logo.svg';
 
 export default function LoginPage() {
@@ -12,6 +13,16 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);
     const [passFocused, setPassFocused] = useState(false);
+
+    const [isDark, setIsDark] = useState(() => {
+        return localStorage.getItem('app-theme') === 'dark' || document.documentElement.getAttribute('data-theme') === 'dark';
+    });
+    const toggleTheme = () => {
+        const nextTheme = isDark ? 'light' : 'dark';
+        setIsDark(!isDark);
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        localStorage.setItem('app-theme', nextTheme);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -56,7 +67,25 @@ export default function LoginPage() {
                 width: 350, height: 350, borderRadius: '50%',
                 background: 'radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)',
                 filter: 'blur(50px)', pointerEvents: 'none', transform: 'translate(-50%, -50%)',
+                filter: 'blur(50px)', pointerEvents: 'none', transform: 'translate(-50%, -50%)',
             }} />
+
+            <div style={{ position: 'absolute', top: 20, right: 30, zIndex: 10 }}>
+                <Tooltip title="Toggle Dark Theme" arrow placement="left">
+                    <IconButton
+                        onClick={toggleTheme}
+                        size="small"
+                        sx={{
+                            backgroundColor: 'var(--bg-card)',
+                            border: '1px solid var(--border)',
+                            transition: 'all 0.2s',
+                            '&:hover': { backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-hover)' }
+                        }}
+                    >
+                        {isDark ? <Sun size={20} color="var(--accent-amber)" /> : <Moon size={20} color="var(--text-muted)" />}
+                    </IconButton>
+                </Tooltip>
+            </div>
 
             <div style={{ display: 'flex', gap: 0, alignItems: 'stretch', position: 'relative', zIndex: 1, maxWidth: 900, width: '100%', margin: '0 24px' }}>
 
@@ -198,11 +227,11 @@ export default function LoginPage() {
                             <div style={{
                                 display: 'flex', alignItems: 'center', gap: 10,
                                 padding: '0 14px',
-                                background: emailFocused ? '#fff' : 'var(--bg-glass)',
+                                background: emailFocused ? 'var(--bg-card)' : 'var(--bg-glass)',
                                 border: `1px solid ${emailFocused ? 'var(--accent-green)' : 'var(--border)'}`,
                                 borderRadius: 'var(--radius-md)',
                                 transition: 'all 0.2s',
-                                boxShadow: emailFocused ? '0 0 0 3px rgba(5,150,105,0.08)' : 'none',
+                                boxShadow: emailFocused ? '0 0 0 3px var(--accent-green-lt)' : 'none',
                             }}>
                                 <Mail size={16} color={emailFocused ? 'var(--accent-green)' : 'var(--text-muted)'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
                                 <input
@@ -235,11 +264,11 @@ export default function LoginPage() {
                             <div style={{
                                 display: 'flex', alignItems: 'center', gap: 10,
                                 padding: '0 14px',
-                                background: passFocused ? '#fff' : 'var(--bg-glass)',
+                                background: passFocused ? 'var(--bg-card)' : 'var(--bg-glass)',
                                 border: `1px solid ${passFocused ? 'var(--accent-green)' : 'var(--border)'}`,
                                 borderRadius: 'var(--radius-md)',
                                 transition: 'all 0.2s',
-                                boxShadow: passFocused ? '0 0 0 3px rgba(5,150,105,0.08)' : 'none',
+                                boxShadow: passFocused ? '0 0 0 3px var(--accent-green-lt)' : 'none',
                             }}>
                                 <Lock size={16} color={passFocused ? 'var(--accent-green)' : 'var(--text-muted)'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
                                 <input

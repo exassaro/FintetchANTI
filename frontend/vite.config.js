@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    allowedHosts: ["selenitical-hemitropic-grayson.ngrok-free.dev"],
     proxy: {
       // All API calls are prefixed with /api to avoid conflicting with
       // React Router frontend routes (/dashboard, /kpi, /review, etc.).

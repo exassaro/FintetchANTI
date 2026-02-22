@@ -23,10 +23,9 @@ class ConfidenceFlagger(BaseDetector):
 
         n_samples = len(confidence)
 
-        # ============================================================
-        # 1️⃣ Relative Confidence Deviation
-        # ============================================================
-
+    
+        # Relative Confidence Deviation
+    
         mean_conf = confidence.mean()
         std_conf = confidence.std()
 
@@ -43,9 +42,9 @@ class ConfidenceFlagger(BaseDetector):
         else:
             relative_score = np.zeros(n_samples)
 
-        # ============================================================
-        # 2️⃣ Confidence Margin (Optional)
-        # ============================================================
+    
+        # Confidence Margin 
+    
 
         if "gst_confidence_margin" in df.columns:
 
@@ -64,18 +63,18 @@ class ConfidenceFlagger(BaseDetector):
         else:
             margin_score = np.zeros(n_samples)
 
-        # ============================================================
-        # 3️⃣ Composite Confidence Score
-        # ============================================================
+        
+        # Composite Confidence Score
+        
 
         confidence_score = (
             0.6 * relative_score +
             0.4 * margin_score
         ).clip(0, 1)
 
-        # ============================================================
-        # 4️⃣ Adaptive Reason Generation
-        # ============================================================
+        
+        # Adaptive Reason Generation
+        
 
         reasons = []
 

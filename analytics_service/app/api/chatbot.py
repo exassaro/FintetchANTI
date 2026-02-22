@@ -1,4 +1,4 @@
-# app/api/chatbot.py
+ # app/api/chatbot.py
 
 import uuid
 from typing import Optional
@@ -6,6 +6,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+import pandas as pd
 
 from app.db.session import get_db
 from app.db import models

@@ -10,8 +10,9 @@ from app.db.base import Base
 from app.db.session import engine, SessionLocal
 from app.api.auth import router as auth_router
 from app.services.seed import seed_admin
+from app.core.logging import setup_logging
 
-logging.basicConfig(level=logging.INFO)
+setup_logging()
 logger = logging.getLogger("auth_service")
 
 

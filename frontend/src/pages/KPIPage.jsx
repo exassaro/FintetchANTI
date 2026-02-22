@@ -67,7 +67,7 @@ export default function KPIPage() {
     );
 
     const compRisk = comp?.compliance_risk_score ?? 0;
-    const riskColor = compRisk > 60 ? 'var(--accent-rose)' : compRisk > 35 ? 'var(--accent-amber)' : 'var(--accent-emerald)';
+    const riskColor = compRisk > 60 ? 'var(--accent-rose)' : compRisk > 35 ? 'var(--accent-amber)' : 'var(--accent-green)';
 
     const radarData = comp ? [
         { subject: 'Anomaly Rate', value: +(comp.anomaly_rate * 100).toFixed(1) },
@@ -101,11 +101,11 @@ export default function KPIPage() {
                     <div className="kpi-grid">
                         {[
                             { label: 'Total Expenses', value: fmtINR(fin?.total_expenses ?? 0), color: 'var(--accent-blue)' },
-                            { label: 'Total GST Liability', value: fmtINR(fin?.total_gst_liability ?? 0), color: 'var(--accent-violet)' },
-                            { label: 'Total ITC Eligible', value: fmtINR(fin?.total_itc_eligible ?? 0), color: 'var(--accent-emerald)' },
+                            { label: 'Total GST Liability', value: fmtINR(fin?.total_gst_liability ?? 0), color: 'var(--accent-indigo)' },
+                            { label: 'Total ITC Eligible', value: fmtINR(fin?.total_itc_eligible ?? 0), color: 'var(--accent-green)' },
                             { label: 'Net GST Payable', value: fmtINR(fin?.net_gst_payable ?? 0), color: 'var(--accent-rose)' },
                             { label: 'Effective Tax Rate', value: `${((fin?.effective_tax_rate ?? 0) * 100).toFixed(2)}%`, color: 'var(--accent-amber)' },
-                            { label: 'ITC Utilization Ratio', value: `${((fin?.itc_utilization_ratio ?? 0) * 100).toFixed(1)}%`, color: 'var(--accent-cyan)' },
+                            { label: 'ITC Utilization Ratio', value: `${((fin?.itc_utilization_ratio ?? 0) * 100).toFixed(1)}%`, color: 'var(--accent-blue)' },
                         ].map((k) => (
                             <div className="kpi-card" key={k.label}>
                                 <div className="kpi-label">{k.label}</div>
@@ -137,7 +137,7 @@ export default function KPIPage() {
                 {/* ── Compliance KPIs ── */}
                 <div className="section-gap animate-fade">
                     <h3 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <ShieldCheck size={18} color="var(--accent-emerald)" /> Compliance KPIs
+                        <ShieldCheck size={18} color="var(--accent-green)" /> Compliance KPIs
                     </h3>
                     <div className="grid-2">
                         <div>
@@ -145,7 +145,7 @@ export default function KPIPage() {
                                 {[
                                     { label: 'Total Transactions', value: comp?.total_transactions?.toLocaleString() },
                                     { label: 'Anomaly Rate', value: `${((comp?.anomaly_rate ?? 0) * 100).toFixed(2)}%`, color: 'var(--accent-rose)' },
-                                    { label: 'High Severity %', value: `${((comp?.high_severity_ratio ?? 0) * 100).toFixed(2)}%`, color: 'var(--accent-orange)' },
+                                    { label: 'High Severity %', value: `${((comp?.high_severity_ratio ?? 0) * 100).toFixed(2)}%`, color: 'var(--accent-amber)' },
                                     { label: 'Low Confidence %', value: `${((comp?.low_confidence_ratio ?? 0) * 100).toFixed(2)}%`, color: 'var(--accent-amber)' },
                                 ].map(k => (
                                     <div className="kpi-card" key={k.label}>
@@ -165,7 +165,7 @@ export default function KPIPage() {
                                     {compRisk.toFixed(1)}
                                 </div>
                                 <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                                    {compRisk > 60 ? <AlertTriangle size={13} color="var(--accent-rose)" /> : compRisk > 35 ? <AlertTriangle size={13} color="var(--accent-amber)" /> : <ShieldCheck size={13} color="var(--accent-emerald)" />}
+                                    {compRisk > 60 ? <AlertTriangle size={13} color="var(--accent-rose)" /> : compRisk > 35 ? <AlertTriangle size={13} color="var(--accent-amber)" /> : <ShieldCheck size={13} color="var(--accent-green)" />}
                                     <span>{compRisk > 60 ? 'High Risk' : compRisk > 35 ? 'Moderate Risk' : 'Low Risk'} / 100</span>
                                 </div>
                                 <div className="progress-bar-wrap" style={{ marginTop: 12 }}>

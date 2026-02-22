@@ -91,7 +91,7 @@ class CSVReader:
     ) -> pd.DataFrame:
         """
         Loads final dataset safely.
-        Optionally loads only selected columns.
+        Optionally loads only selected columns if they exist in the file.
         """
 
         final_path = self.resolve_final_dataset_path(
@@ -99,12 +99,26 @@ class CSVReader:
             anomaly_file_path
         )
 
-        df = pd.read_csv(
-            final_path,
-            usecols=columns if columns else None,
-        )
+        if columns:
+            # Read just the header to see available columns
+            header_df = pd.read_csv(final_path, nrows=0)
+            available_cols = list(header_df.columns)
+            valid_usecols = [c for c in columns if c in available_cols]
+            
+            # If no requested columns are present, return empty DF with requested columns
+            if not valid_usecols:
+                return pd.DataFrame(columns=columns)
 
-        return df
+            df = pd.read_csv(final_path, usecols=valid_usecols)
+            
+            # Add back missing columns as NaN to match requested contract
+            for col in columns:
+                if col not in df.columns:
+                    df[col] = pd.NA
+                    
+            return df
+        else:
+            return pd.read_csv(final_path)
 
     # ======================================================
     # EFFECTIVE GST SLAB RESOLUTION

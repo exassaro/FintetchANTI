@@ -37,9 +37,9 @@ class NumericDetector(BaseDetector):
                 pd.Series("none", index=df.index),
             )
 
-        # -----------------------------
+        
         # Basic numeric safety
-        # -----------------------------
+        
 
         df[numeric_features] = df[numeric_features].fillna(
             df[numeric_features].median()
@@ -47,9 +47,9 @@ class NumericDetector(BaseDetector):
 
         n_samples = len(df)
 
-        # ============================================================
-        # 1️⃣ Isolation Forest (Slab-conditioned + Global fallback)
-        # ============================================================
+        
+        # Isolation Forest (Slab-conditioned + Global fallback)
+        
 
         MIN_SLAB_SIZE = 30
 
@@ -122,9 +122,9 @@ class NumericDetector(BaseDetector):
         # Cleanup helper column
         df.drop(columns=["numeric_score_iforest_global"], inplace=True)
 
-        # ============================================================
-        # 2️⃣ Statistical Scores
-        # ============================================================
+        
+        # Statistical Scores
+        
 
         # Z-score
         if "amount_zscore" in df.columns:
@@ -162,9 +162,9 @@ class NumericDetector(BaseDetector):
         else:
             df["numeric_score_iqr"] = 0.0
 
-        # ============================================================
-        # 3️⃣ Autoencoder (Optimized for Large Uploads)
-        # ============================================================
+        
+        # Autoencoder (Optimized for Large Uploads)
+        
 
         MAX_TRAIN_SAMPLES = 20000
 
@@ -255,9 +255,9 @@ class NumericDetector(BaseDetector):
         else:
             df["numeric_score_ae"] = 0.0
 
-        # ============================================================
-        # 4️⃣ Composite Score
-        # ============================================================
+        
+        # Composite Score
+        
 
         numeric_score = (
             0.35 * df["numeric_score_iforest"] +
@@ -266,9 +266,9 @@ class NumericDetector(BaseDetector):
             0.15 * df["numeric_score_iqr"]
         ).clip(0, 1)
 
-        # ============================================================
-        # 5️⃣ Reason Builder
-        # ============================================================
+    
+        # Reason Builder
+        
 
         def build_reason(row):
             reasons = []

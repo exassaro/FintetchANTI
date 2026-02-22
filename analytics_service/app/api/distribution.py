@@ -74,10 +74,13 @@ def get_vendor_distribution(
     )
 
     if "vendor_name" not in df.columns:
-        raise HTTPException(
-            status_code=400,
-            detail="vendor_name column not found in dataset."
-        )
+        return {
+            "upload_id": str(upload_id),
+            "metric": "vendor_spend",
+            "total_spend": 0.0,
+            "top_n": top_n,
+            "data": []
+        }
 
     df = df.dropna(subset=["vendor_name"])
 
@@ -137,10 +140,13 @@ def get_category_distribution(
     )
 
     if "category" not in df.columns:
-        raise HTTPException(
-            status_code=400,
-            detail="category column not found in dataset."
-        )
+        return {
+            "upload_id": str(upload_id),
+            "metric": "category_spend",
+            "total_spend": 0.0,
+            "top_n": top_n,
+            "data": []
+        }
 
     df = df.dropna(subset=["category"])
 

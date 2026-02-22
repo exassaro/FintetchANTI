@@ -98,8 +98,8 @@ export default function Sidebar() {
                                             sx={{
                                                 ml: 'auto', height: 20, fontSize: '0.58rem',
                                                 fontWeight: 700, letterSpacing: '0.05em',
-                                                background: '#FFFBEB', color: '#92400E',
-                                                border: '1px solid #FDE68A',
+                                                background: 'var(--accent-amber-lt)', color: 'var(--text-primary)',
+                                                border: '1px solid var(--accent-amber-border)',
                                                 '& .MuiChip-label': { px: 0.7 },
                                             }}
                                         />
@@ -111,8 +111,8 @@ export default function Sidebar() {
                                             sx={{
                                                 ml: 'auto', height: 20, fontSize: '0.58rem',
                                                 fontWeight: 700, letterSpacing: '0.05em',
-                                                background: '#ECFDF5', color: '#059669',
-                                                border: '1px solid #A7F3D0',
+                                                background: 'var(--accent-green-lt)', color: 'var(--text-primary)',
+                                                border: '1px solid var(--accent-green-border)',
                                                 '& .MuiChip-label': { px: 0.7 },
                                             }}
                                         />
@@ -143,7 +143,7 @@ export default function Sidebar() {
                             value={progressPercent}
                             sx={{
                                 height: 5, borderRadius: 3,
-                                backgroundColor: '#E2E8F0',
+                                backgroundColor: 'var(--border)',
                                 '& .MuiLinearProgress-bar': {
                                     background: progressPercent === 100
                                         ? 'linear-gradient(90deg, #059669, #10B981)'
@@ -162,8 +162,8 @@ export default function Sidebar() {
                             <div key={step.stage} className="pipeline-step">
                                 <div className={`step-dot ${getDotClass(step)}`} />
                                 <span style={{
-                                    color: getDotClass(step) === 'done' ? '#059669'
-                                        : getDotClass(step) === 'active' ? '#3B82F6'
+                                    color: getDotClass(step) === 'done' ? 'var(--accent-green)'
+                                        : getDotClass(step) === 'active' ? 'var(--accent-blue)'
                                             : 'var(--text-muted)',
                                     fontSize: '0.78rem',
                                     fontWeight: getDotClass(step) === 'done' ? 600 : 400,

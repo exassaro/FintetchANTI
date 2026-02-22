@@ -106,20 +106,30 @@ def classify_hsn(df: pd.DataFrame) -> pd.DataFrame:
     for idx, row in out.iterrows():
         raw_code = row["hsn_sac_code"]
 
-        if raw_code is None or str(raw_code).strip() == "":
-            raise DataValidationError(
-                f"Missing HSN/SAC for transaction_id={row['transaction_id']}"
-            )
+        if pd.isna(raw_code) or raw_code is None or str(raw_code).strip() == "" or str(raw_code).strip().lower() == "nan":
+            out.at[idx, "gst_slab_predicted"] = None
+            out.at[idx, "gst_confidence"] = 0.0
+            out.at[idx, "rule_explanation"] = "Missing HSN/SAC code"
+            continue
 
         code = str(raw_code).strip()
-        code_type = _infer_code_type(code)
+        if code.endswith(".0"):
+            code = code[:-2]
+        
+        try:
+            code_type = _infer_code_type(code)
+        except DataValidationError as e:
+            out.at[idx, "gst_slab_predicted"] = None
+            out.at[idx, "gst_confidence"] = 0.0
+            out.at[idx, "rule_explanation"] = str(e)
+            continue
 
-        rule = lookup[code_type].get(code)
+        rule = lookup.get(code_type, {}).get(code)
         if rule is None:
-            raise DataValidationError(
-                f"Unmapped {code_type} code '{code}' "
-                f"for transaction_id={row['transaction_id']}"
-            )
+            out.at[idx, "gst_slab_predicted"] = None
+            out.at[idx, "gst_confidence"] = 0.0
+            out.at[idx, "rule_explanation"] = f"Unmapped {code_type} code '{code}'"
+            continue
 
         gst_slab = rule["gst_slab"]
 

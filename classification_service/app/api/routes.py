@@ -1,6 +1,9 @@
 import os
 import uuid
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -12,6 +15,7 @@ from app.services.column_normalizer import normalize_columns
 from app.services.schema_detector import detect_schema
 from app.services.preprocessing import preprocess
 from app.services.classifier import classify
+from app.services.hsn_classifier import DataValidationError
 from app.services.model_loader import get_model_metadata
 from app.utils.file_namer import generate_filename
 
@@ -51,18 +55,19 @@ async def upload_csv(
 
     raw_path = os.path.join(RAW_STORAGE, raw_filename)
 
-    # 1️⃣ Save Raw File
+    # Save Raw File
     try:
         content = await file.read()
         with open(raw_path, "wb") as f:
             f.write(content)
     except Exception as exc:
+        logger.error(f"Failed to save uploaded file: {exc}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"Failed to save uploaded file: {exc}"
         )
 
-    # 2️⃣ Insert Upload Record
+    # Insert Upload Record
     upload_record = Upload(
         id=upload_id,
         original_filename=file.filename,
@@ -75,10 +80,10 @@ async def upload_csv(
     db.commit()
 
     try:
-        # 3️⃣ Load CSV
+        # Load CSV
         df = pd.read_csv(raw_path)
 
-        # 4️⃣ Normalize Columns
+        # Normalize Columns
         df, metadata = normalize_columns(df)
 
         if metadata["needs_review"]:
@@ -93,7 +98,7 @@ async def upload_csv(
                 }
             )
 
-        # 5️⃣ Detect Schema (NOW df exists)
+        # Detect Schema (NOW df exists)
         schema = detect_schema(set(df.columns))
 
         upload_record.schema_type = schema
@@ -110,13 +115,13 @@ async def upload_csv(
 
         classified_path = os.path.join(CLASSIFIED_STORAGE, classified_filename)
 
-        # 6️⃣ Preprocess
+        # Preprocess
         df_processed = preprocess(df, schema)
 
-        # 7️⃣ Classify
+        # Classify
         df_classified = classify(df_processed, schema)
 
-        # 8️⃣ Model Metadata
+        # Model Metadata
         if schema == "H":
             model_meta = {
                 "model_name": "HSN_RULE_ENGINE",
@@ -127,7 +132,7 @@ async def upload_csv(
 
         avg_conf = float(df_classified["gst_confidence"].mean())
 
-        # 9️⃣ Save Classified Output
+        # Save Classified Output
         df_classified.to_csv(classified_path, index=False)
 
         upload_record.classified_file_path = classified_path
@@ -155,7 +160,18 @@ async def upload_csv(
     except HTTPException:
         raise
 
+    except DataValidationError as e:
+        logger.warning(f"Classification validation error: {e}")
+        upload_record.status = STATUS_FAILED
+        db.commit()
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"Classification failed: {e}"
+        )
+
     except Exception as exc:
+        logger.error(f"Classification completely failed due to an unexpected error: {exc}", exc_info=True)
         upload_record.status = STATUS_FAILED
         db.commit()
 

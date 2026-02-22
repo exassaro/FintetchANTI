@@ -48,6 +48,8 @@ const CustomTooltip = ({ active, payload, label }) => {
     );
 };
 
+const renderPieLabel = ({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`;
+
 export default function DashboardPage() {
     const { uploadId } = usePipeline();
     const navigate = useNavigate();
@@ -160,7 +162,7 @@ export default function DashboardPage() {
                     <div className="kpi-card success">
                         <div className="kpi-icon-wrap"><CheckCircle size={16} /></div>
                         <div className="kpi-label">Avg. GST Confidence</div>
-                        <div className="kpi-value" style={{ color: 'var(--accent-emerald)' }}>
+                        <div className="kpi-value" style={{ color: 'var(--accent-green)' }}>
                             {((summary?.avg_confidence ?? 0) * 100).toFixed(1)}%
                         </div>
                         <div className="kpi-subtext">Model classification confidence</div>
@@ -217,11 +219,19 @@ export default function DashboardPage() {
                         </div>
                         <div className="chart-container" style={{ height: 240 }}>
                             <ResponsiveContainer width="100%" height="100%">
-                                <PieChart onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
-                                    <Pie data={slabPieData} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`} labelLine={false}>
+                                <PieChart>
+                                    <Pie
+                                        data={slabPieData}
+                                        cx="50%" cy="50%"
+                                        outerRadius={90}
+                                        dataKey="value"
+                                        label={renderPieLabel}
+                                        labelLine={false}
+                                        isAnimationActive={false}
+                                    >
                                         {slabPieData.map((_, i) => <Cell key={i} fill={SLAB_COLORS[i % SLAB_COLORS.length]} />)}
                                     </Pie>
-                                    <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
+                                    <Tooltip content={<CustomTooltip />} />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
@@ -262,18 +272,18 @@ export default function DashboardPage() {
                                 <div className="kpi-value" style={{ fontSize: '1.6rem' }}>{anomalyStats.avg_anomaly_score?.toFixed(3)}</div>
                             </div>
                             <div className="card-glass">
-                                <div className="kpi-label">High Severity</div>
+                                <div className="kpi-label">🔴 High Severity</div>
                                 <div className="kpi-value" style={{ fontSize: '1.6rem', color: 'var(--accent-rose)' }}>{anomalyStats.high_severity}</div>
                                 <div className="kpi-subtext">score ≥ 0.75</div>
                             </div>
                             <div className="card-glass">
-                                <div className="kpi-label">🟡 Medium</div>
+                                <div className="kpi-label">🟡 Medium Severity</div>
                                 <div className="kpi-value" style={{ fontSize: '1.6rem', color: 'var(--accent-amber)' }}>{anomalyStats.medium_severity}</div>
                                 <div className="kpi-subtext">0.50 – 0.74</div>
                             </div>
                             <div className="card-glass">
-                                <div className="kpi-label">🟢 Low</div>
-                                <div className="kpi-value" style={{ fontSize: '1.6rem', color: 'var(--accent-emerald)' }}>{anomalyStats.low_severity}</div>
+                                <div className="kpi-label">🟢 Low Severity</div>
+                                <div className="kpi-value" style={{ fontSize: '1.6rem', color: 'var(--accent-green)' }}>{anomalyStats.low_severity}</div>
                                 <div className="kpi-subtext">score &lt; 0.50</div>
                             </div>
                         </div>

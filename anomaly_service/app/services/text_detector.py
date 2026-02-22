@@ -29,9 +29,9 @@ class TextDetector(BaseDetector):
 
         n_samples = len(df)
 
-        # ============================================================
-        # 1️⃣ Text Length Extremes
-        # ============================================================
+        
+        # Text Length Extremes
+       
 
         l_min, l_max = df["text_len"].min(), df["text_len"].max()
 
@@ -43,9 +43,9 @@ class TextDetector(BaseDetector):
         length_score = np.abs(length_norm - 0.5) * 2.0
         length_score = pd.Series(length_score, index=df.index)
 
-        # ============================================================
-        # 2️⃣ Description Frequency Rarity
-        # ============================================================
+        
+        # Description Frequency Rarity
+        
 
         desc_counts = df["text_input_clean"].value_counts()
         df["desc_frequency"] = df["text_input_clean"].map(desc_counts)
@@ -60,9 +60,10 @@ class TextDetector(BaseDetector):
 
         freq_score = pd.Series(freq_score, index=df.index)
 
-        # ============================================================
-        # 3️⃣ Sentence Embeddings
-        # ============================================================
+        
+        
+        # Sentence Embeddings
+        
 
         embeddings = self.model.encode(
             df["text_input_clean"].tolist(),
@@ -71,9 +72,9 @@ class TextDetector(BaseDetector):
             convert_to_numpy=True
         )
 
-        # ============================================================
-        # 4️⃣ KMeans Cluster Distance
-        # ============================================================
+        
+        # KMeans Cluster Distance
+        
 
         n_clusters = max(5, min(30, n_samples // 100 or 5))
 
@@ -101,9 +102,9 @@ class TextDetector(BaseDetector):
 
         cluster_distance_score = pd.Series(cluster_distance_score, index=df.index)
 
-        # ============================================================
-        # 5️⃣ kNN Density Anomaly
-        # ============================================================
+        
+        # kNN Density Anomaly
+        
 
         k_neighbors = min(10, max(3, n_samples // 200 or 3))
 
@@ -122,9 +123,9 @@ class TextDetector(BaseDetector):
 
         knn_score = pd.Series(knn_score, index=df.index)
 
-        # ============================================================
-        # 6️⃣ Cluster Rarity
-        # ============================================================
+        
+        # Cluster Rarity
+        
 
         cluster_counts = pd.Series(cluster_labels).value_counts()
         cluster_freq = pd.Series(cluster_labels).map(cluster_counts)
@@ -141,10 +142,9 @@ class TextDetector(BaseDetector):
 
         cluster_rarity_score = pd.Series(cluster_rarity_score, index=df.index)
 
-        # ============================================================
-        # 7️⃣ Composite NLP Score
-        # ============================================================
-
+    
+        # Composite NLP Score
+        
         nlp_score = (
             0.25 * cluster_distance_score +
             0.20 * knn_score +
@@ -153,9 +153,9 @@ class TextDetector(BaseDetector):
             0.15 * length_score
         ).clip(0, 1)
 
-        # ============================================================
-        # 8️⃣ Reason Generation
-        # ============================================================
+        
+        # Reason Generation
+        
 
         reasons = []
 

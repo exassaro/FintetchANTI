@@ -76,7 +76,7 @@ export default function ChatbotPage() {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 53px)' }}>
             <div className="page-header" style={{ flexShrink: 0 }}>
                 <div className="page-header-left">
                     <div className="page-breadcrumb">Review & AI › AI Chatbot</div>
@@ -97,15 +97,16 @@ export default function ChatbotPage() {
                     size="small"
                     sx={{
                         mt: 1.5,
-                        background: '#ECFDF5', color: '#059669',
-                        border: '1px solid #A7F3D0',
+                        mt: 1.5,
+                        background: 'var(--accent-green-lt)', color: 'var(--text-primary)',
+                        border: '1px solid var(--accent-green-border)',
                         fontWeight: 600, fontSize: '0.72rem',
-                        '& .MuiChip-icon': { color: '#059669' },
+                        '& .MuiChip-icon': { color: 'var(--accent-green)' },
                     }}
                 />
             </div>
 
-            <div className="page-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <div className="page-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, padding: '22px 30px', minHeight: 0 }}>
                 <div style={{ display: 'flex', gap: 20, flex: 1, minHeight: 0 }}>
                     {/* Chat Panel */}
                     <Paper
@@ -113,14 +114,15 @@ export default function ChatbotPage() {
                         sx={{
                             flex: 1, display: 'flex', flexDirection: 'column',
                             overflow: 'hidden',
-                            border: '1px solid #E2E8F0',
+                            border: '1px solid var(--border)',
                             borderRadius: 3,
+                            background: 'var(--bg-primary)',
                         }}
                     >
                         {/* Header */}
                         <Box sx={{
                             p: '16px 20px',
-                            borderBottom: '1px solid #E2E8F0',
+                            borderBottom: '1px solid var(--border)',
                             display: 'flex', alignItems: 'center', gap: 1.2,
                         }}>
                             <Avatar sx={{
@@ -130,16 +132,16 @@ export default function ChatbotPage() {
                                 <img src={logoUrl} alt="Auri Logo" style={{ width: 38, height: 38, objectFit: 'contain' }} />
                             </Avatar>
                             <div>
-                                <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1E293B' }}>
+                                <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--text-primary)' }}>
                                     Auri
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                     <Box sx={{
                                         width: 7, height: 7, borderRadius: '50%',
-                                        background: '#10B981',
-                                        boxShadow: '0 0 6px rgba(16,185,129,0.7)',
+                                        background: 'var(--accent-green)',
+                                        boxShadow: '0 0 6px var(--accent-green-lt)',
                                     }} />
-                                    <Typography variant="caption" sx={{ color: '#059669', fontWeight: 500, fontSize: '0.72rem' }}>
+                                    <Typography variant="caption" sx={{ color: 'var(--accent-green)', fontWeight: 500, fontSize: '0.72rem' }}>
                                         Online · Upload ID: {uploadId?.slice(0, 8)}…
                                     </Typography>
                                 </Box>
@@ -225,8 +227,8 @@ export default function ChatbotPage() {
 
                         {/* Input */}
                         <Box sx={{
-                            p: '14px 20px', borderTop: '1px solid #E2E8F0',
-                            background: '#FAFBFC',
+                            p: '14px 20px', borderTop: '1px solid var(--border)',
+                            background: 'var(--bg-card)',
                         }}>
                             <div className="chat-input-row">
                                 <textarea
@@ -274,7 +276,8 @@ export default function ChatbotPage() {
                         elevation={0}
                         sx={{
                             width: 230, flexShrink: 0,
-                            border: '1px solid #E2E8F0',
+                            border: '1px solid var(--border)',
+                            background: 'var(--bg-primary)',
                             borderRadius: 3,
                             overflow: 'hidden',
                             display: 'flex', flexDirection: 'column',
@@ -282,8 +285,8 @@ export default function ChatbotPage() {
                     >
                         <Box sx={{
                             p: '14px 16px',
-                            borderBottom: '1px solid #E2E8F0',
-                            background: '#F7FAF8',
+                            borderBottom: '1px solid var(--border)',
+                            background: 'var(--bg-secondary)',
                         }}>
                             <Typography variant="subtitle2" sx={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Lightbulb size={14} /> Suggested Queries
