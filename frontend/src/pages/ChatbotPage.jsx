@@ -7,7 +7,7 @@ import {
     Avatar, Chip, IconButton, Tooltip, Paper, Typography,
     Box, Fade, Grow
 } from '@mui/material';
-import logoUrl from '../assets/logo.svg';
+import logoUrl from '../assets/logogreen.svg';
 
 const SUGGESTIONS = [
     'What is the total GST liability?',

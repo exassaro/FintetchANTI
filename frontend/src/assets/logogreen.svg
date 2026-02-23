@@ -5,7 +5,9 @@
       .cls-1, .cls-2 {
         stroke-width: 0px;
       }
-
+      .cls-1 {
+        fill: #059669; /* var(--accent-green) */
+      }
       .cls-2 {
         fill: #fff;
       }

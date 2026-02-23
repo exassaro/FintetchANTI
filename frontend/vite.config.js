@@ -39,6 +39,7 @@ export default defineConfig({
       '/api/review': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
       '/api/chatbot': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
       '/api/explain': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+      '/api/news': { target: 'http://localhost:8003', changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
     },
   },
 })

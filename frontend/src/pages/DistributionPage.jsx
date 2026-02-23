@@ -96,7 +96,7 @@ export default function DistributionPage() {
                                     <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 10 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                         <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
                                         <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={120} />
-                                        <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
+                                        <Tooltip content={<CustomTooltip />} isAnimationActive={anim} cursor={{ fill: 'rgba(128, 128, 128, 0.1)' }} />
                                         <Bar dataKey="value" name="Spend (₹)" radius={[0, 4, 4, 0]}>
                                             {vendorData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                                         </Bar>

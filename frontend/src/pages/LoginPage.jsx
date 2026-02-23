@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../api/auth';
-import { LogIn, AlertTriangle, Loader2, Lock, Mail, BarChart2, ShieldCheck, Brain, Sun, Moon } from 'lucide-react';
-import { IconButton, Tooltip } from '@mui/material';
+import { getFinancialNews } from '../api/analytics';
+import { LogIn, AlertTriangle, Loader2, Lock, Mail, BarChart2, ShieldCheck, Brain, Sun, Moon, Link } from 'lucide-react';
+import { IconButton, Tooltip, Fade } from '@mui/material';
 import logoUrl from '../assets/logo.svg';
 
 export default function LoginPage() {
@@ -13,16 +14,33 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);
     const [passFocused, setPassFocused] = useState(false);
+    const [news, setNews] = useState([]);
+
+    // Fetch the news dynamically for the login background scatter effect
+    React.useEffect(() => {
+        const fetchFeeds = async () => {
+            try {
+                const res = await getFinancialNews();
+                // Pick top 6 global feeds with highest score, skip empty
+                if (res?.articles?.length > 0) {
+                    const sorted = res.articles.sort((a, b) => b.relevance_score - a.relevance_score).slice(0, 6);
+                    setNews(sorted);
+                }
+            } catch (err) { }
+        };
+        fetchFeeds();
+    }, []);
 
     const [isDark, setIsDark] = useState(() => {
         return localStorage.getItem('app-theme') === 'dark' || document.documentElement.getAttribute('data-theme') === 'dark';
     });
-    const toggleTheme = () => {
-        const nextTheme = isDark ? 'light' : 'dark';
-        setIsDark(!isDark);
-        document.documentElement.setAttribute('data-theme', nextTheme);
-        localStorage.setItem('app-theme', nextTheme);
-    };
+
+    React.useEffect(() => {
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('app-theme', isDark ? 'dark' : 'light');
+    }, [isDark]);
+
+    const toggleTheme = () => setIsDark(!isDark);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -87,20 +105,54 @@ export default function LoginPage() {
                 </Tooltip>
             </div>
 
-            <div style={{ display: 'flex', gap: 0, alignItems: 'stretch', position: 'relative', zIndex: 1, maxWidth: 900, width: '100%', margin: '0 24px' }}>
+            {/* Floating News Headlines Scatter (Global Level) */}
+            {news.map((item, i) => {
+                const isIndian = item.tags?.includes('India');
+                return (
+                    <div key={i} style={{
+                        position: 'absolute',
+                        zIndex: 0,
+                        top: i === 0 ? '10%' : i === 1 ? '85%' : i === 2 ? '48%' : i === 3 ? '15%' : i === 4 ? '82%' : '50%',
+                        left: i < 3 ? (i === 0 ? '3%' : i === 1 ? '5%' : '1%') : 'auto',
+                        right: i >= 3 ? (i === 3 ? '4%' : i === 4 ? '6%' : '1.5%') : 'auto',
+                        '--rotation': `${i % 2 === 0 ? '-6deg' : '7deg'}`,
+                        width: isIndian ? [260, 310, 360, 240, 300, 390][i % 6] : [160, 210, 260, 170, 220, 280][i % 6],
+                        padding: isIndian ? '18px 22px' : '14px 16px',
+                        background: isDark ? 'linear-gradient(135deg, rgba(36, 36, 36, 0.45) 0%, rgba(20, 20, 20, 0.25) 100%)' : 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(240, 240, 240, 0.25) 100%)',
+                        border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(255, 255, 255, 0.4)',
+                        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
+                        borderLeft: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
+                        borderRadius: 'var(--radius-xl)',
+                        backdropFilter: 'blur(16px) saturate(120%)',
+                        boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05)' : '0 8px 32px rgba(31, 38, 135, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.5)',
+                        color: 'var(--text-primary)',
+                        animation: `float-anim ${6 + i * 1.5}s ease-in-out infinite alternate`,
+                        pointerEvents: 'none'
+                    }}>
+                        <div style={{ fontSize: isIndian ? '0.65rem' : '0.55rem', fontWeight: 800, letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: 8, display: 'flex', gap: 6, alignItems: 'center', textTransform: 'uppercase' }}>
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-amber)' }} />
+                            {item.source}
+                        </div>
+                        <div style={{ fontSize: isIndian ? '0.9rem' : '0.75rem', fontWeight: 600, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: isIndian ? 4 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {item.title}
+                        </div>
+                    </div>
+                )
+            })}
+
+            <div style={{ display: 'flex', gap: 0, alignItems: 'stretch', position: 'relative', zIndex: 1, maxWidth: 880, width: '100%', margin: '0 24px' }}>
 
                 {/* ── Left panel: Branding & features ── */}
-                <div style={{
-                    flex: '1 1 420px',
+                <div className="glass-card" style={{
+                    flex: '1 1 440px',
                     padding: '48px 40px',
-                    background: 'var(--gradient-primary)',
+                    background: isDark ? 'linear-gradient(135deg, rgba(5,150,105,0.7) 0%, rgba(16,185,129,0.5) 100%)' : 'linear-gradient(135deg, rgba(5,150,105,0.85) 0%, rgba(16,185,129,0.7) 100%)',
                     borderRadius: '16px 0 0 16px',
+                    borderRight: 'none',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
                     color: '#fff',
-                    position: 'relative',
-                    overflow: 'hidden',
                 }}>
                     {/* Subtle pattern overlay */}
                     <div style={{
@@ -114,13 +166,15 @@ export default function LoginPage() {
                         pointerEvents: 'none',
                     }} />
 
-                    <div style={{ position: 'relative', zIndex: 1 }}>
+
+
+                    <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', marginBottom: 'auto' }}>
                         {/* Logo */}
                         <div style={{
                             display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
                             marginBottom: 24,
                         }}>
-                            <img src={logoUrl} alt="Logo" style={{ width: 90, height: 90, objectFit: 'contain' }} />
+                            <img src={logoUrl} alt="Logo" style={{ width: 85, height: 85, objectFit: 'contain' }} />
                         </div>
 
                         <h1 style={{
@@ -132,7 +186,7 @@ export default function LoginPage() {
                         </h1>
                         <p style={{
                             fontSize: '0.85rem', opacity: 0.85,
-                            lineHeight: 1.6, marginBottom: 36,
+                            lineHeight: 1.6, marginBottom: 32,
                             color: 'rgba(255,255,255,0.85)',
                         }}>
                             Transforming Audits into Strategic Insight with Advanced Intelligence.
@@ -145,13 +199,10 @@ export default function LoginPage() {
                                 { icon: <ShieldCheck size={18} />, title: 'Anomaly Detection', desc: 'Multi-signal fraud & error scoring' },
                                 { icon: <BarChart2 size={18} />, title: 'Real-Time Analytics', desc: 'Dashboards, KPIs, forecasting & AI chatbot' },
                             ].map((f, i) => (
-                                <div key={i} style={{
+                                <div key={i} className="glass-card" style={{
                                     display: 'flex', gap: 14, alignItems: 'flex-start',
                                     padding: '12px 14px',
-                                    background: 'rgba(255,255,255,0.1)',
                                     borderRadius: 10,
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                    backdropFilter: 'blur(6px)',
                                 }}>
                                     <div style={{
                                         width: 34, height: 34, borderRadius: 8,
@@ -163,7 +214,7 @@ export default function LoginPage() {
                                     </div>
                                     <div>
                                         <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 2 }}>{f.title}</div>
-                                        <div style={{ fontSize: '0.76rem', opacity: 0.75, lineHeight: 1.4 }}>{f.desc}</div>
+                                        <div style={{ fontSize: '0.78rem', opacity: 0.75, lineHeight: 1.4 }}>{f.desc}</div>
                                     </div>
                                 </div>
                             ))}
@@ -172,21 +223,18 @@ export default function LoginPage() {
                 </div>
 
                 {/* ── Right panel: Login form ── */}
-                <div style={{
-                    flex: '1 1 420px',
+                <div className="glass-card" style={{
+                    flex: '1 1 440px',
                     padding: '48px 40px',
-                    background: 'var(--bg-card)',
                     borderRadius: '0 16px 16px 0',
-                    border: '1px solid var(--border)',
                     borderLeft: 'none',
-                    boxShadow: 'var(--shadow-lg)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
                 }}>
                     <div style={{ marginBottom: 32 }}>
                         <h2 style={{
-                            fontSize: '1.35rem', fontWeight: 800,
+                            fontSize: '1.45rem', fontWeight: 800,
                             color: 'var(--text-primary)', letterSpacing: '-0.02em',
                             marginBottom: 6,
                         }}>
@@ -224,14 +272,9 @@ export default function LoginPage() {
                             }}>
                                 Email Address
                             </label>
-                            <div style={{
+                            <div className={`glass-input ${emailFocused ? 'focused' : ''}`} style={{
                                 display: 'flex', alignItems: 'center', gap: 10,
                                 padding: '0 14px',
-                                background: emailFocused ? 'var(--bg-card)' : 'var(--bg-glass)',
-                                border: `1px solid ${emailFocused ? 'var(--accent-green)' : 'var(--border)'}`,
-                                borderRadius: 'var(--radius-md)',
-                                transition: 'all 0.2s',
-                                boxShadow: emailFocused ? '0 0 0 3px var(--accent-green-lt)' : 'none',
                             }}>
                                 <Mail size={16} color={emailFocused ? 'var(--accent-green)' : 'var(--text-muted)'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
                                 <input
@@ -261,14 +304,9 @@ export default function LoginPage() {
                             }}>
                                 Password
                             </label>
-                            <div style={{
+                            <div className={`glass-input ${passFocused ? 'focused' : ''}`} style={{
                                 display: 'flex', alignItems: 'center', gap: 10,
                                 padding: '0 14px',
-                                background: passFocused ? 'var(--bg-card)' : 'var(--bg-glass)',
-                                border: `1px solid ${passFocused ? 'var(--accent-green)' : 'var(--border)'}`,
-                                borderRadius: 'var(--radius-md)',
-                                transition: 'all 0.2s',
-                                boxShadow: passFocused ? '0 0 0 3px var(--accent-green-lt)' : 'none',
                             }}>
                                 <Lock size={16} color={passFocused ? 'var(--accent-green)' : 'var(--text-muted)'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
                                 <input

@@ -21,6 +21,7 @@ Write-Host ""
 # Helper: build the command string for each service window
 function Start-Service($name, $port, $folder, $color) {
     $cmd = @"
+[console]::title = '$name ($folder) - Port $port'
 try { & '$condaHook' } catch {}
 conda activate $condaEnv
 Set-Location '$root\$folder'

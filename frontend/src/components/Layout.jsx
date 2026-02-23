@@ -18,6 +18,7 @@ const PAGE_TITLES = {
     '/distribution': { title: 'Distribution', sub: 'Analytics' },
     '/review': { title: 'Review Queue', sub: 'Compliance' },
     '/chatbot': { title: 'AI Chatbot', sub: 'AI Assistant' },
+    '/news': { title: 'Financial News', sub: 'Global Feed' },
 };
 
 export default function Layout() {

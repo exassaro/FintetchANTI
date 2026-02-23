@@ -248,7 +248,7 @@ export default function DashboardPage() {
                                 <BarChart data={slabSpendData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }} onMouseEnter={() => setTimeout(() => setAnim(true), 100)} onMouseLeave={() => setAnim(false)}>
                                     <XAxis dataKey="slab" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={formatYAxis} />
-                                    <Tooltip content={<CustomTooltip />} isAnimationActive={anim} />
+                                    <Tooltip content={<CustomTooltip />} isAnimationActive={anim} cursor={{ fill: 'rgba(128, 128, 128, 0.1)' }} />
                                     <Bar dataKey="spend" name="Spend (₹)" radius={[4, 4, 0, 0]}>
                                         {slabSpendData.map((_, i) => <Cell key={i} fill={SLAB_COLORS[i % SLAB_COLORS.length]} />)}
                                     </Bar>

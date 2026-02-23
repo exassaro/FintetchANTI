@@ -74,3 +74,7 @@ export const sendChatbotQuery = (uploadId, query, rowIndex = null) =>
         query,
         ...(rowIndex !== null ? { row_index: rowIndex } : {}),
     }).then(r => r.data);
+
+// ── News ───────────────────────────────────────────────────
+export const getFinancialNews = () =>
+    axios.get('/api/news/').then(r => r.data);

@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
     UploadCloud, LayoutDashboard, TrendingUp, BarChart2,
-    MessageSquare, Eye, Activity, Zap, Bot
+    MessageSquare, Eye, Activity, Zap, Bot, Globe
 } from 'lucide-react';
 import logoUrl from '../assets/logo.svg';
 import { usePipeline } from '../context/PipelineContext';
@@ -13,6 +13,7 @@ const navItems = [
         section: 'Pipeline',
         items: [
             { to: '/', icon: UploadCloud, label: 'Upload & Process', always: true },
+            { to: '/news', icon: Globe, label: 'Live News', always: true },
         ]
     },
     {

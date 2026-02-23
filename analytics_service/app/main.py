@@ -5,7 +5,7 @@ from app.core.logging import setup_logging
 
 from app.db.base import Base
 from app.db.session import engine
-from app.api import forecast, review, dashboard, time_series, kpi, chatbot, distribution
+from app.api import forecast, review, dashboard, time_series, kpi, chatbot, distribution, news
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ app.include_router(time_series.router)
 app.include_router(kpi.router)
 app.include_router(chatbot.router)
 app.include_router(distribution.router)
+app.include_router(news.router)
 
 @app.get("/health")
 def health():
