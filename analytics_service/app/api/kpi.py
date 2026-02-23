@@ -3,7 +3,7 @@
 import uuid
 import pandas as pd
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -74,20 +74,28 @@ def get_financial_kpis(
 
     df = csv_reader.ensure_effective_slab_column(df)
 
+    import numpy as np
+
+    gst_app = df.get("gst_applicable", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+    itc_elig = df.get("itc_eligible", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+
     # Derive GST features
     df["gst_rate"] = df["gst_slab_effective"] / 100
-    df["gst_liability"] = df["amount"] * df["gst_rate"]
+    
+    mask_gst = gst_app & (df["gst_slab_effective"] > 0)
+    df["taxable_value"] = np.where(mask_gst, df["amount"] / (1 + df["gst_rate"]), df["amount"])
+    df["gst_liability"] = np.where(mask_gst, df["amount"] - df["taxable_value"], 0.0)
 
-    df["itc_eligible_flag"] = df["gst_slab_effective"].isin({5, 18, 40})
-    df["itc_eligible_amount"] = df["amount"].where(
-        df["itc_eligible_flag"], 0
-    )
+    mask_itc = mask_gst & itc_elig
+    df["itc_eligible_amount"] = np.where(mask_itc, df["gst_liability"], 0.0)
 
     total_expenses = float(df["amount"].sum())
-    total_gst_liability = float(df["gst_liability"].sum())
-    total_itc = float(df["itc_eligible_amount"].sum())
+    total_gst_liability = round(float(df["gst_liability"].sum()), 2)
+    total_itc = round(float(df["itc_eligible_amount"].sum()), 2)
 
-    net_gst_payable = max(total_gst_liability - total_itc, 0)
+    net_gst_payable_raw = total_gst_liability - total_itc
+    net_gst_payable = round(max(net_gst_payable_raw, 0.0), 2)
+    carry_forward_itc = round(abs(net_gst_payable_raw) if net_gst_payable_raw < 0 else 0.0, 2)
 
     effective_tax_rate = (
         total_gst_liability / total_expenses
@@ -103,6 +111,7 @@ def get_financial_kpis(
         "upload_id": str(upload_id),
         "financial_kpis": {
             "total_expenses": total_expenses,
+            "net_amount": round(float(df["taxable_value"].sum()), 2),
             "total_gst_liability": total_gst_liability,
             "total_itc_eligible": total_itc,
             "net_gst_payable": net_gst_payable,
@@ -199,3 +208,58 @@ def get_compliance_kpis(
     cache.set(upload_id, cache_key, result)
 
     return result
+
+
+# ======================================================
+# 3️⃣ EXPORT SUMMARY CSV
+# ======================================================
+
+@router.get("/{upload_id}/export")
+def export_summary_csv(
+    upload_id: uuid.UUID,
+    db: Session = Depends(get_db)
+):
+    anomaly_run = _get_completed_anomaly_run(db, upload_id)
+    df = csv_reader.load_dataframe(upload_id, anomaly_run.anomaly_file_path)
+    df = csv_reader.ensure_effective_slab_column(df)
+
+    import numpy as np
+
+    gst_app = df.get("gst_applicable", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+    itc_elig = df.get("itc_eligible", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+
+    # Derive GST features
+    df["gst_rate"] = df["gst_slab_effective"] / 100
+    mask_gst = gst_app & (df["gst_slab_effective"] > 0)
+    df["taxable_value"] = np.where(mask_gst, df["amount"] / (1 + df["gst_rate"]), df["amount"])
+    df["gst_liability"] = np.where(mask_gst, df["amount"] - df["taxable_value"], 0.0)
+
+    mask_itc = mask_gst & itc_elig
+    df["itc_eligible_amount"] = np.where(mask_itc, df["gst_liability"], 0.0)
+
+    date_col = csv_reader.detect_date_column(df)
+    if date_col and date_col in df.columns:
+        df["transaction_date"] = df[date_col]
+    else:
+        df["transaction_date"] = None
+    
+    export_df = pd.DataFrame()
+    export_df["transaction_id"] = df.get("transaction_id", range(1, len(df)+1))
+    export_df["transaction_date"] = df["transaction_date"]
+    export_df["amount"] = df.get("amount", 0.0)
+    export_df["currency"] = df.get("currency", "INR")
+    export_df["description"] = df.get("description", "")
+    export_df["vendor_name"] = df.get("vendor_name", "")
+    export_df["category_label"] = df.get("category_label", df.get("category", ""))
+    export_df["gst_slab"] = df["gst_slab_effective"]
+    export_df["net_amount"] = df["taxable_value"]
+    export_df["itc_eligible_amount"] = df["itc_eligible_amount"]
+    export_df["gst_liablity_amount"] = df["gst_liability"]
+
+    csv_data = export_df.to_csv(index=False)
+    
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=summary_{upload_id}.csv"}
+    )

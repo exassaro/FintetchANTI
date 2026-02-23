@@ -331,7 +331,7 @@ export default function UploadPage() {
                 {!running && !allDone && !file && (
                     <div className="grid-3 section-gap animate-fade">
                         {[
-                            { icon: <Brain size={38} color="var(--accent-indigo)" />, title: 'Smart Classification', desc: 'ML models trained on Indian B2B GST transactions classify each row into GST slabs (0%, 5%, 12%, 18%, 28%) or HSN/SAC codes.' },
+                            { icon: <Brain size={38} color="var(--accent-indigo)" />, title: 'Smart Classification', desc: 'ML models trained on Indian B2B GST transactions classify each row into GST slabs (0%, 5%, 18%, 40%) or HSN/SAC codes.' },
                             { icon: <ShieldAlert size={38} color="var(--accent-rose)" />, title: 'Multi-Signal Anomaly Detection', desc: 'IsolationForest + Autoencoder + NLP clustering + confidence scoring detect suspicious transactions with adaptive thresholds.' },
                             { icon: <BarChart2 size={38} color="var(--accent-green)" />, title: 'Real-Time Analytics', desc: 'Instant dashboards, KPI reports, GST forecasting, compliance scoring, and AI-powered natural language queries.' },
                         ].map(c => (

@@ -161,12 +161,16 @@ class ForecastEngine:
 
         df[slab_col] = pd.to_numeric(df[slab_col], errors="coerce")
         df["gst_rate"] = df[slab_col] / 100.0
-        df["gst_liability"] = df["amount"] * df["gst_rate"]
 
-        df["itc_eligible_flag"] = df[slab_col].isin(ITC_ELIGIBLE_SLABS)
-        df["itc_eligible_amount"] = np.where(
-            df["itc_eligible_flag"], df["amount"], 0.0
-        )
+        gst_app = df.get("gst_applicable", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+        itc_elig = df.get("itc_eligible", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+
+        mask_gst = gst_app & (df[slab_col] > 0)
+        df["taxable_value"] = np.where(mask_gst, df["amount"] / (1 + df["gst_rate"]), df["amount"])
+        df["gst_liability"] = np.where(mask_gst, df["amount"] - df["taxable_value"], 0.0)
+
+        mask_itc = mask_gst & itc_elig
+        df["itc_eligible_amount"] = np.where(mask_itc, df["gst_liability"], 0.0)
 
         return df
 
@@ -186,6 +190,7 @@ class ForecastEngine:
             df.groupby("_month")
             .agg(
                 total_expenses=("amount", "sum"),
+                net_amount=("taxable_value", "sum"),
                 gst_liability=("gst_liability", "sum"),
                 itc_eligible_amount=("itc_eligible_amount", "sum"),
                 txn_count=("amount", "size"),

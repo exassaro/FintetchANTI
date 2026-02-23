@@ -34,7 +34,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
         <div style={{
-            background: '#fff', border: '1px solid var(--border)',
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
             borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem',
             boxShadow: 'var(--shadow-md)'
         }}>

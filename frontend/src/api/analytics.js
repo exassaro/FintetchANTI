@@ -26,6 +26,10 @@ export const getFinancialKPIs = (uploadId) =>
 export const getComplianceKPIs = (uploadId) =>
     axios.get(`/api/kpi/${uploadId}/compliance`).then(r => r.data);
 
+export const exportSummaryCSV = (uploadId) => {
+    window.open(`/api/kpi/${uploadId}/export`, '_blank');
+};
+
 // ── Forecast ───────────────────────────────────────────────
 export const getForecast = (uploadId, metric = 'total_expenses', excludeAnomalies = true) =>
     axios.get(`/api/forecast/${uploadId}`, {

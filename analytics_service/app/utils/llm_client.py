@@ -55,7 +55,12 @@ def call_llm(context_payload: Dict[str, Any]) -> Tuple[str, str]:
         Anomaly Reasons: {context_payload.get('anomaly_reasons')}
         Is Anomaly: {context_payload.get('is_anomaly')}
 
-        Explain clearly and professionally why this transaction was flagged, and specifically what a human reviewer should verify.
+        Explain clearly and professionally why this transaction was highlighted.
+        If it's an anomaly, explain why it was flagged as anomalous.
+        If it has low GST confidence, explain why the GST slab is ambiguous for this vendor/category.
+        Specifically mention what a human reviewer should verify.
+
+        Keep your explanation EXTREMELY CONCISE (maximum 2-3 short sentences). Get straight to the point.
         
         CRITICAL FORMATTING INSTRUCTIONS:
         - NEVER USE MARKDOWN. Do not use asterisks (*) for lists or bolding.

@@ -201,13 +201,20 @@ def get_itc_ratio_over_time(
 
     df["_month"] = df[date_col].dt.to_period("M").dt.to_timestamp()
 
+    import numpy as np
+
+    gst_app = df.get("gst_applicable", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+    itc_elig = df.get("itc_eligible", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+
     # Derive GST features
     df["gst_rate"] = df["gst_slab_effective"] / 100
-    df["gst_liability"] = df["amount"] * df["gst_rate"]
-    df["itc_eligible_flag"] = df["gst_slab_effective"].isin({5, 18, 40})
-    df["itc_eligible_amount"] = df["amount"].where(
-        df["itc_eligible_flag"], 0
-    )
+    
+    mask_gst = gst_app & (df["gst_slab_effective"] > 0)
+    df["taxable_value"] = np.where(mask_gst, df["amount"] / (1 + df["gst_rate"]), df["amount"])
+    df["gst_liability"] = np.where(mask_gst, df["amount"] - df["taxable_value"], 0.0)
+
+    mask_itc = mask_gst & itc_elig
+    df["itc_eligible_amount"] = np.where(mask_itc, df["gst_liability"], 0.0)
 
     grouped = (
         df.groupby("_month")

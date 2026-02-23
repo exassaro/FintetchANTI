@@ -23,7 +23,7 @@ const formatYAxis = (tickItem) => {
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
-        <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
             <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
             {payload.filter(p => p.value != null).map(p => (
                 <p key={p.dataKey} style={{ color: p.color }}>
@@ -36,6 +36,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const METRICS = [
     { value: 'total_expenses', label: 'Total Expenses' },
+    { value: 'net_amount', label: 'Net Amount' },
     { value: 'gst_liability', label: 'GST Liability' },
     { value: 'itc_eligible_amount', label: 'ITC Eligible Amount' },
 ];

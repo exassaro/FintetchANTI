@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, IndianRupee, Percent, ShieldCheck, TrendingDown, Crosshair } from 'lucide-react';
+import { AlertTriangle, IndianRupee, Percent, ShieldCheck, TrendingDown, Crosshair, Download } from 'lucide-react';
 import {
     RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer,
     BarChart, Bar, XAxis, YAxis, Tooltip, Cell
 } from 'recharts';
 import { usePipeline } from '../context/PipelineContext';
-import { getFinancialKPIs, getComplianceKPIs } from '../api/analytics';
+import { getFinancialKPIs, getComplianceKPIs, exportSummaryCSV } from '../api/analytics';
 import { Skeleton, Alert as MuiAlert, Box } from '@mui/material';
 
 const fmtINR = (v) =>
@@ -23,7 +23,7 @@ const formatYAxis = (tickItem) => {
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
-        <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
             <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
             {payload.filter(p => p.value != null).map(p => <p key={p.dataKey} style={{ color: p.color }}>{p.name}: <strong>{p.value}</strong></p>)}
         </div>
@@ -78,9 +78,9 @@ export default function KPIPage() {
 
     const barData = fin ? [
         { name: 'Total Expenses', value: fin.total_expenses, color: '#059669' },
+        { name: 'Amount after GST', value: fin.net_amount, color: '#10B981' },
         { name: 'GST Liability', value: fin.total_gst_liability, color: '#3B82F6' },
         { name: 'ITC Eligible', value: fin.total_itc_eligible, color: '#6366F1' },
-        { name: 'Net GST Payable', value: fin.net_gst_payable, color: '#F43F5E' },
     ] : [];
 
     return (
@@ -90,6 +90,9 @@ export default function KPIPage() {
                     <div className="page-breadcrumb">Analytics › KPI Reports</div>
                     <h1>KPI Reports</h1>
                 </div>
+                <button className="btn btn-primary" onClick={() => exportSummaryCSV(uploadId)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Download size={16} /> Export Summary CSV
+                </button>
             </div>
 
             <div className="page-body">
@@ -101,9 +104,9 @@ export default function KPIPage() {
                     <div className="kpi-grid">
                         {[
                             { label: 'Total Expenses', value: fmtINR(fin?.total_expenses ?? 0), color: 'var(--accent-blue)' },
+                            { label: 'Amount after GST', value: fmtINR(fin?.net_amount ?? 0), color: '#10B981' },
                             { label: 'Total GST Liability', value: fmtINR(fin?.total_gst_liability ?? 0), color: 'var(--accent-indigo)' },
                             { label: 'Total ITC Eligible', value: fmtINR(fin?.total_itc_eligible ?? 0), color: 'var(--accent-green)' },
-                            { label: 'Net GST Payable', value: fmtINR(fin?.net_gst_payable ?? 0), color: 'var(--accent-rose)' },
                             { label: 'Effective Tax Rate', value: `${((fin?.effective_tax_rate ?? 0) * 100).toFixed(2)}%`, color: 'var(--accent-amber)' },
                             { label: 'ITC Utilization Ratio', value: `${((fin?.itc_utilization_ratio ?? 0) * 100).toFixed(1)}%`, color: 'var(--accent-blue)' },
                         ].map((k) => (

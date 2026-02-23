@@ -171,11 +171,22 @@ def chatbot_query(
     elif intent == "itc_ratio":
         df = csv_reader.load_dataframe(payload.upload_id, anomaly_run.anomaly_file_path)
         df = csv_reader.ensure_effective_slab_column(df)
+        import numpy as np
+        gst_app = df.get("gst_applicable", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+        itc_elig = df.get("itc_eligible", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
+
         df["gst_rate"] = df["gst_slab_effective"] / 100
-        df["gst_liability"] = df["amount"] * df["gst_rate"]
-        df["itc_eligible"] = df["gst_slab_effective"].isin({5, 18, 40})
-        itc_ratio = (df[df["itc_eligible"]]["amount"].sum() / df["gst_liability"].sum() if df["gst_liability"].sum() > 0 else 0)
-        data_context = {"itc_ratio": round(itc_ratio, 4), "total_gst_liability": round(df["gst_liability"].sum(), 2)}
+        mask_gst = gst_app & (df["gst_slab_effective"] > 0)
+        df["taxable_value"] = np.where(mask_gst, df["amount"] / (1 + df["gst_rate"]), df["amount"])
+        df["gst_liability"] = np.where(mask_gst, df["amount"] - df["taxable_value"], 0.0)
+
+        mask_itc = mask_gst & itc_elig
+        df["itc_eligible_amount"] = np.where(mask_itc, df["gst_liability"], 0.0)
+
+        total_itc = float(df["itc_eligible_amount"].sum())
+        total_gst = float(df["gst_liability"].sum())
+        itc_ratio = total_itc / total_gst if total_gst > 0 else 0
+        data_context = {"itc_ratio": round(itc_ratio, 4), "total_gst_liability": round(total_gst, 2)}
 
     elif intent == "slab_distribution":
         df = csv_reader.load_dataframe(payload.upload_id, anomaly_run.anomaly_file_path)

@@ -1516,6 +1516,18 @@ hr {
   color: var(--text-primary) !important;
 }
 
+[data-theme="dark"] .MuiMenuItem-root:hover {
+  background-color: var(--bg-glass-hover) !important;
+}
+
+[data-theme="dark"] .MuiMenuItem-root.Mui-selected {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] .MuiMenuItem-root.Mui-selected:hover {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+}
+
 [data-theme="dark"] .MuiSelect-select {
   color: var(--text-primary) !important;
 }

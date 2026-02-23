@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    AlertTriangle, CheckCircle, XCircle, Eye, Filter, Loader2, Calendar, Search
+    AlertTriangle, CheckCircle, XCircle, Eye, Filter, Loader2, Calendar, Search, Sparkles
 } from 'lucide-react';
 import { usePipeline } from '../context/PipelineContext';
-import { getReviewQueue, submitReviewDecision, clearReviewQueueCache } from '../api/analytics';
+import { getReviewQueue, submitReviewDecision, clearReviewQueueCache, sendChatbotQuery } from '../api/analytics';
 import {
     Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
     Button, Snackbar, Alert, Chip, Tooltip, Fade, Skeleton,
@@ -25,6 +25,8 @@ export default function ReviewPage() {
     const [error, setError] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, msg: '', severity: 'success' });
     const [expanded, setExpanded] = useState(null);
+    const [enhancedReasons, setEnhancedReasons] = useState({});
+    const [loadingReasons, setLoadingReasons] = useState({});
 
     const [filterType, setFilterType] = useState('');
     const [severityFilter, setSeverityFilter] = useState('');
@@ -58,6 +60,35 @@ export default function ReviewPage() {
     }, [uploadId, filterType]);
 
     useEffect(() => { loadQueue(); }, [loadQueue]);
+
+    const handleExpand = (rowIndex) => {
+        if (expanded === rowIndex) {
+            setExpanded(null);
+        } else {
+            setExpanded(rowIndex);
+        }
+    };
+
+    const fetchExplanation = (rowIndex, flagType) => {
+        if (!enhancedReasons[rowIndex] && !loadingReasons[rowIndex]) {
+            setLoadingReasons(prev => ({ ...prev, [rowIndex]: true }));
+            const prompt = flagType === 'anomaly'
+                ? "Explain this anomaly in detail."
+                : "Explain why this item has a low confidence GST classification.";
+
+            sendChatbotQuery(uploadId, prompt, rowIndex)
+                .then(r => {
+                    setEnhancedReasons(prev => ({ ...prev, [rowIndex]: r.response }));
+                })
+                .catch(e => {
+                    console.error("Failed to explain item", e);
+                    setEnhancedReasons(prev => ({ ...prev, [rowIndex]: "Failed to load explanation." }));
+                })
+                .finally(() => {
+                    setLoadingReasons(prev => ({ ...prev, [rowIndex]: false }));
+                });
+        }
+    };
 
     const markDecision = (rowIndex, decision) => {
         setPendingDecisions(prev => {
@@ -400,7 +431,7 @@ export default function ReviewPage() {
                                                                 <button
                                                                     className="btn btn-icon btn-secondary"
                                                                     style={{ color: expanded === row.row_index ? '#059669' : '' }}
-                                                                    onClick={() => setExpanded(expanded === row.row_index ? null : row.row_index)}
+                                                                    onClick={() => handleExpand(row.row_index)}
                                                                 >
                                                                     <Eye size={14} />
                                                                 </button>
@@ -431,7 +462,7 @@ export default function ReviewPage() {
                                                                 {row.anomaly_reasons && (
                                                                     <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed var(--border)' }}>
                                                                         <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F43F5E', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                                                                            <AlertTriangle size={14} /> Anomaly Reasons
+                                                                            <AlertTriangle size={14} /> Anomaly Reasons (Raw)
                                                                         </div>
                                                                         <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                                                                             {(Array.isArray(row.anomaly_reasons) ? row.anomaly_reasons : [row.anomaly_reasons]).map((r, i) => (
@@ -440,6 +471,36 @@ export default function ReviewPage() {
                                                                         </ul>
                                                                     </div>
                                                                 )}
+
+                                                                <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed var(--border)' }}>
+                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                                                                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-indigo)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                                            <Sparkles size={14} /> AI Enhanced Context
+                                                                        </div>
+                                                                        {!enhancedReasons[row.row_index] && !loadingReasons[row.row_index] && (
+                                                                            <Button
+                                                                                variant="outlined"
+                                                                                size="small"
+                                                                                startIcon={<Sparkles size={14} />}
+                                                                                onClick={() => fetchExplanation(row.row_index, row.flag_type)}
+                                                                                sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.7rem', padding: '2px 8px', borderColor: 'var(--accent-indigo)', color: 'var(--accent-indigo)' }}
+                                                                            >
+                                                                                Explain with AI
+                                                                            </Button>
+                                                                        )}
+                                                                    </div>
+                                                                    {loadingReasons[row.row_index] ? (
+                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                                                                            <Loader2 size={14} className="spin" /> Generating explanation...
+                                                                        </div>
+                                                                    ) : enhancedReasons[row.row_index] ? (
+                                                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.5, background: 'var(--bg-primary)', padding: 12, borderRadius: 6, border: '1px solid var(--border)' }}>
+                                                                            {enhancedReasons[row.row_index]}
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Click the button above to generate contextual data using the LLM.</div>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </td>
                                                     </tr>

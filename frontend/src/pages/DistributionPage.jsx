@@ -25,7 +25,7 @@ const formatYAxis = (tickItem) => {
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
-        <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.82rem', boxShadow: 'var(--shadow-md)' }}>
             <p style={{ color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{label}</p>
             {payload.filter(p => p.value != null).map(p => <p key={p.name} style={{ color: p.color || p.payload.fill }}>{p.name}: <strong>{p.value > 100 ? fmtINR(p.value) : p.value}</strong></p>)}
         </div>

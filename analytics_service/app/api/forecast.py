@@ -22,6 +22,7 @@ forecast_engine = ForecastEngine()
 
 VALID_METRICS = {
     "total_expenses",
+    "net_amount",
     "gst_liability",
     "itc_eligible_amount",
     "txn_count",

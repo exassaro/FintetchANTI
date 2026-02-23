@@ -139,4 +139,5 @@ class ExplanationEngine:
             "anomaly_score": float(row.get("anomaly_score", 0)),
             "anomaly_reasons": str(row.get("anomaly_reasons", "")),
             "is_anomaly": bool(row.get("is_anomaly", False)),
+            "prompt_version": 2, # Bust cache for concise prompt
         }
