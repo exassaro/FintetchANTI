@@ -65,7 +65,7 @@ export default function Sidebar() {
         <aside className="sidebar">
             <div className="sidebar-logo">
                 <div className="logo-mark">
-                    <div className="logo-icon"><img src={logoUrl} alt="Logo" style={{ width: 48, height: 48, objectFit: 'contain' }} /></div>
+                    <div className="logo-icon"><img src={logoUrl} alt="Logo" style={{ width: 50, height: 50, objectFit: 'contain' }} /></div>
                     <div className="logo-text">
                         <span className="logo-name">Auditron</span>
                         <span className="logo-tagline">SME Audit Platform</span>

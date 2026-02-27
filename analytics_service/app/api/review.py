@@ -49,7 +49,7 @@ def _get_completed_anomaly_run(
 
 
 # ======================================================
-# 1️⃣ GET REVIEW QUEUE
+# GET REVIEW QUEUE
 # ======================================================
 
 @router.get("/{upload_id}/queue")
@@ -57,7 +57,7 @@ def get_review_queue(
     upload_id: uuid.UUID,
     filter_type: Optional[str] = Query(
         None,
-        description="Optional filter: anomaly_only"
+        description="Optional filter: anomaly"
     ),
     db: Session = Depends(get_db)
 ):
@@ -84,7 +84,7 @@ def get_review_queue(
 
 
 # ======================================================
-# 2️⃣ CREATE REVIEW DECISION
+# CREATE REVIEW DECISION
 # ======================================================
 
 @router.post("/{upload_id}/decision", response_model=ReviewDecisionResponse)
@@ -121,7 +121,7 @@ def create_review_decision(
 
 
 # ======================================================
-# 3️⃣ DOWNLOAD REVIEWED FILE
+# DOWNLOAD REVIEWED FILE
 # ======================================================
 
 @router.get("/{upload_id}/download")

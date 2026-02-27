@@ -33,7 +33,7 @@ class ExplanationEngine:
     ) -> Dict[str, Any]:
 
         # -----------------------------------------------
-        # 1️⃣ Load final dataset
+        # Load final dataset
         # -----------------------------------------------
 
         df = self.csv_reader.load_dataframe(
@@ -49,7 +49,7 @@ class ExplanationEngine:
         transaction_id = str(row.get("transaction_id", row_index))
 
         # -----------------------------------------------
-        # 2️⃣ Build structured input context
+        # Build structured input context
         # -----------------------------------------------
 
         context_payload = self._build_context(row)
@@ -57,7 +57,7 @@ class ExplanationEngine:
         prompt_hash = self._hash_payload(context_payload)
 
         # -----------------------------------------------
-        # 3️⃣ Check if explanation already exists
+        # Check if explanation already exists
         # -----------------------------------------------
 
         existing = (
@@ -78,13 +78,13 @@ class ExplanationEngine:
             }
 
         # -----------------------------------------------
-        # 4️⃣ Call LLM
+        # Call LLM
         # -----------------------------------------------
 
         explanation_text, model_used = call_llm(context_payload)
 
         # -----------------------------------------------
-        # 5️⃣ Persist in DB
+        # Persist in DB
         # -----------------------------------------------
 
         explanation_record = LLMExplanation(

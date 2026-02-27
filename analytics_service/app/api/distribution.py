@@ -50,7 +50,7 @@ def _get_completed_anomaly_run(
 
 
 # ======================================================
-# 1️⃣ VENDOR SPEND
+# VENDOR SPEND
 # ======================================================
 
 @router.get("/{upload_id}/vendors")
@@ -116,7 +116,7 @@ def get_vendor_distribution(
 
 
 # ======================================================
-# 2️⃣ CATEGORY SPEND
+# CATEGORY SPEND
 # ======================================================
 
 @router.get("/{upload_id}/categories")

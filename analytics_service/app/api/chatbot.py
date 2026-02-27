@@ -1,5 +1,3 @@
- # app/api/chatbot.py
-
 import uuid
 from typing import Optional
 

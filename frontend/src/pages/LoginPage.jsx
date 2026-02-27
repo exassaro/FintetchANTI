@@ -85,7 +85,6 @@ export default function LoginPage() {
                 width: 350, height: 350, borderRadius: '50%',
                 background: 'radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)',
                 filter: 'blur(50px)', pointerEvents: 'none', transform: 'translate(-50%, -50%)',
-                filter: 'blur(50px)', pointerEvents: 'none', transform: 'translate(-50%, -50%)',
             }} />
 
             <div style={{ position: 'absolute', top: 20, right: 30, zIndex: 10 }}>
@@ -172,9 +171,9 @@ export default function LoginPage() {
                         {/* Logo */}
                         <div style={{
                             display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-                            marginBottom: 24,
+
                         }}>
-                            <img src={logoUrl} alt="Logo" style={{ width: 85, height: 85, objectFit: 'contain' }} />
+                            <img src={logoUrl} alt="Logo" style={{ width: 70, height: 70, objectFit: 'contain' }} />
                         </div>
 
                         <h1 style={{

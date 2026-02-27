@@ -51,7 +51,7 @@ def _get_completed_anomaly_run(
 
 
 # ======================================================
-# 1️⃣ FINANCIAL KPI
+# FINANCIAL KPI
 # ======================================================
 
 @router.get("/{upload_id}/financial")
@@ -126,7 +126,7 @@ def get_financial_kpis(
 
 
 # ======================================================
-# 2️⃣ COMPLIANCE KPI
+# COMPLIANCE KPI
 # ======================================================
 
 @router.get("/{upload_id}/compliance")
@@ -211,7 +211,7 @@ def get_compliance_kpis(
 
 
 # ======================================================
-# 3️⃣ EXPORT SUMMARY CSV
+# EXPORT SUMMARY CSV
 # ======================================================
 
 @router.get("/{upload_id}/export")

@@ -45,7 +45,7 @@ def _get_completed_anomaly_run(
 
 
 # ======================================================
-# 1️⃣ SUMMARY KPI
+# SUMMARY KPI
 # ======================================================
 
 @router.get("/{upload_id}/summary")
@@ -68,7 +68,7 @@ def get_dashboard_summary(
 
 
 # ======================================================
-# 2️⃣ SLAB DISTRIBUTION
+# SLAB DISTRIBUTION
 # ======================================================
 
 @router.get("/{upload_id}/slabs")
@@ -91,7 +91,7 @@ def get_slab_distribution(
 
 
 # ======================================================
-# 3️⃣ SLAB-WISE SPEND
+# SLAB-WISE SPEND
 # ======================================================
 
 @router.get("/{upload_id}/slab-spend")
@@ -114,7 +114,7 @@ def get_slab_wise_spend(
 
 
 # ======================================================
-# 4️⃣ ANOMALY STATISTICS
+# ANOMALY STATISTICS
 # ======================================================
 
 @router.get("/{upload_id}/anomalies")
@@ -137,7 +137,7 @@ def get_anomaly_statistics(
 
 
 # ======================================================
-# 5️⃣ MONTHLY TRENDS
+# MONTHLY TRENDS
 # ======================================================
 
 @router.get("/{upload_id}/monthly")

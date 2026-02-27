@@ -1,5 +1,3 @@
-# app/services/cache_manager.py
-
 import time
 import threading
 import uuid

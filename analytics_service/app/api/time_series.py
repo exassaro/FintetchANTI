@@ -97,7 +97,7 @@ def get_time_series_generic(
 
 
 # ======================================================
-# 1️⃣ TOTAL EXPENSES
+# TOTAL EXPENSES
 # ======================================================
 
 @router.get("/{upload_id}/expenses")
@@ -122,7 +122,7 @@ def get_total_expenses(
 
 
 # ======================================================
-# 2️⃣ GST LIABILITY
+# GST LIABILITY
 # ======================================================
 
 @router.get("/{upload_id}/gst")
@@ -147,7 +147,7 @@ def get_gst_liability(
 
 
 # ======================================================
-# 3️⃣ ITC ELIGIBLE AMOUNT
+# ITC ELIGIBLE AMOUNT
 # ======================================================
 
 @router.get("/{upload_id}/itc")
@@ -172,7 +172,7 @@ def get_itc_eligible_amount(
 
 
 # ======================================================
-# 4️⃣ ITC CONTRIBUTION RATIO OVER TIME
+# ITC CONTRIBUTION RATIO OVER TIME
 # ======================================================
 
 @router.get("/{upload_id}/itc-ratio")

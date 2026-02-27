@@ -97,7 +97,6 @@ export default function ChatbotPage() {
                     size="small"
                     sx={{
                         mt: 1.5,
-                        mt: 1.5,
                         background: 'var(--accent-green-lt)', color: 'var(--text-primary)',
                         border: '1px solid var(--accent-green-border)',
                         fontWeight: 600, fontSize: '0.72rem',
