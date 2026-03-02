@@ -1,3 +1,10 @@
+"""
+Configuration module for the GST Classification Service.
+
+Loads environment variables for database, MLflow, HSN lookup,
+storage paths, and the model feature contract.
+"""
+
 import os
 from dotenv import load_dotenv
 

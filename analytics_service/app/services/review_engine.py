@@ -1,5 +1,6 @@
 # app/services/review_engine.py
 
+import json
 import os
 import uuid
 import shutil
@@ -234,5 +235,4 @@ class ReviewEngine:
         elif filter_type == "low_confidence":
             review_df = review_df[review_df.get("is_anomaly", pd.Series([False] * len(review_df))) != True]
 
-        import json
         return json.loads(review_df.to_json(orient="records"))

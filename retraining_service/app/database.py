@@ -1,3 +1,10 @@
+"""
+Database engine and session factory for the Retraining Service.
+
+Provides the SQLAlchemy engine, session factory, declarative base,
+and a request-scoped session generator for FastAPI dependency injection.
+"""
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.config import DATABASE_URL

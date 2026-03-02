@@ -1,6 +1,16 @@
+"""Preprocessing pipeline for the Classification Service.
+
+Cleans text fields, engineers numeric and text features, and
+validates the feature contract before classification.
+"""
+
+import logging
 import re
+
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 # ==========================================================
@@ -8,6 +18,17 @@ import pandas as pd
 # ==========================================================
 
 def clean_text_series(s: pd.Series) -> pd.Series:
+    """Clean a pandas Series of text values.
+
+    Applies lowercasing, special character removal, and whitespace
+    normalisation.
+
+    Args:
+        s: Series of raw text strings.
+
+    Returns:
+        pd.Series: Cleaned text values.
+    """
     s = s.fillna("").astype(str)
     s = s.str.strip().str.lower()
     s = s.apply(lambda x: re.sub(r"[^0-9a-zA-Z\s]", " ", x))
@@ -16,6 +37,14 @@ def clean_text_series(s: pd.Series) -> pd.Series:
 
 
 def is_effectively_nonempty_text(s: pd.Series) -> pd.Series:
+    """Check which rows have non-empty text after stripping whitespace.
+
+    Args:
+        s: Series of text values.
+
+    Returns:
+        pd.Series: Boolean series, True where text is non-empty.
+    """
     return s.fillna("").astype(str).str.strip().ne("")
 
 

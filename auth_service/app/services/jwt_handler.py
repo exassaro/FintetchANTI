@@ -9,6 +9,16 @@ from app.config import settings
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    """Create a signed JWT access token.
+
+    Args:
+        data: Payload dictionary (must include 'sub' for user ID).
+        expires_delta: Optional custom expiry duration. Defaults to
+                       ``settings.ACCESS_TOKEN_EXPIRE_MINUTES``.
+
+    Returns:
+        str: Encoded JWT string.
+    """
     to_encode = data.copy()
 
     expire = datetime.now(timezone.utc) + (

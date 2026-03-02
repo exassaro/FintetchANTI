@@ -1,3 +1,10 @@
+"""
+SQLAlchemy model for retraining job records.
+
+Tracks each retraining execution with status, metrics, model
+versioning, and promotion results.
+"""
+
 import uuid
 from datetime import datetime
 
@@ -9,6 +16,12 @@ from app.database import Base
 
 
 class RetrainingJob(Base):
+    """Represents a single ML retraining job execution.
+
+    Tracks lifecycle from pending → running → completed/failed,
+    including evaluation metrics and model promotion results.
+    """
+
     __tablename__ = "retraining_jobs"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

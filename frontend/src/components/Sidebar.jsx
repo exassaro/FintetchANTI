@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
     UploadCloud, LayoutDashboard, TrendingUp, BarChart2,
-    MessageSquare, Eye, Activity, Zap, Bot, Globe
+    MessageSquare, Eye, Activity, Zap, Bot, Globe, RotateCcw
 } from 'lucide-react';
 import logoUrl from '../assets/logo.svg';
 import { usePipeline } from '../context/PipelineContext';
@@ -31,6 +31,12 @@ const navItems = [
         items: [
             { to: '/review', icon: Eye, label: 'Review Queue', requiresStage: 'detected' },
             { to: '/chatbot', icon: Bot, label: 'AI Chatbot', requiresStage: 'detected' },
+        ]
+    },
+    {
+        section: 'MLOps',
+        items: [
+            { to: '/retraining', icon: RotateCcw, label: 'Retraining', always: true },
         ]
     }
 ];

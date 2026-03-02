@@ -1,3 +1,10 @@
+"""
+Configuration module for the Anomaly Detection Service.
+
+Loads environment variables for database connection and storage paths.
+Raises ``ValueError`` on missing required configuration.
+"""
+
 import os
 from dotenv import load_dotenv
 

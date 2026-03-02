@@ -1,5 +1,15 @@
+"""Chatbot API for the Analytics Service.
+
+Provides a single query endpoint that routes user queries to the
+appropriate analytics engine (KPI, forecast, distributions, etc.)
+and formats the response via an LLM.
+"""
+
+import logging
 import uuid
 from typing import Optional
+
+import numpy as np
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -16,6 +26,8 @@ from app.services.explanation_engine import ExplanationEngine
 from app.services.cache_manager import CacheManager
 
 from app.utils.llm_client import call_llm
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/chatbot", tags=["Chatbot"])
@@ -73,6 +85,17 @@ def _get_completed_anomaly_run(
 # ======================================================
 
 def detect_intent(query: str):
+    """Classify a user query into a known intent.
+
+    Uses simple keyword matching to route to the correct
+    analytics engine or fall back to the LLM.
+
+    Args:
+        query: The user's natural-language query.
+
+    Returns:
+        str: Intent identifier string.
+    """
 
     q = query.lower()
 
@@ -113,8 +136,20 @@ def detect_intent(query: str):
 @router.post("/query")
 def chatbot_query(
     payload: ChatbotQuery,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
+    """Process a chatbot query with intent routing.
+
+    Detects user intent, fetches relevant data from the appropriate
+    engine, and formats the final response via an LLM.
+
+    Args:
+        payload: Request body with upload_id, query, and optional row_index.
+        db: Database session (injected via ``Depends``).
+
+    Returns:
+        dict: Response with intent, model_used, and formatted response text.
+    """
 
     anomaly_run = _get_completed_anomaly_run(db, payload.upload_id)
 
@@ -169,7 +204,6 @@ def chatbot_query(
     elif intent == "itc_ratio":
         df = csv_reader.load_dataframe(payload.upload_id, anomaly_run.anomaly_file_path)
         df = csv_reader.ensure_effective_slab_column(df)
-        import numpy as np
         gst_app = df.get("gst_applicable", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
         itc_elig = df.get("itc_eligible", pd.Series([True]*len(df), index=df.index)).fillna(True).astype(bool)
 
@@ -224,8 +258,11 @@ def chatbot_query(
                 payload.upload_id,
                 anomaly_run.anomaly_file_path
             )}
-        except:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "Failed to compute dashboard summary for LLM fallback: %s",
+                exc,
+            )
 
     # --------------------------------------------------
     # FINAL LLM PASS FOR FORMATTING

@@ -13,6 +13,7 @@ import DistributionPage from './pages/DistributionPage';
 import ReviewPage from './pages/ReviewPage';
 import ChatbotPage from './pages/ChatbotPage';
 import NewsPage from './pages/NewsPage';
+import RetrainingPage from './pages/RetrainingPage';
 
 function ProtectedRoutes() {
   const { isAuthenticated, loading } = useAuth();
@@ -39,6 +40,7 @@ function ProtectedRoutes() {
           <Route path="/review" element={<ReviewPage />} />
           <Route path="/chatbot" element={<ChatbotPage />} />
           <Route path="/news" element={<NewsPage />} />
+          <Route path="/retraining" element={<RetrainingPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

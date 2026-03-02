@@ -79,10 +79,11 @@ def log_and_maybe_promote(schema_type: str, model, metrics: dict):
     # ----------------------------------------------------------
     try:
         client.create_registered_model(model_name)
-        logger.info(f"Created new registered model: {model_name}")
+        logger.info("Created new registered model: %s", model_name)
     except Exception:
-        # Already exists — that's fine
-        pass
+        logger.debug(
+            "Registered model '%s' already exists (expected)", model_name
+        )
 
     mv = client.create_model_version(
         name=model_name,

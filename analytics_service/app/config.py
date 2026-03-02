@@ -1,7 +1,22 @@
+"""
+Configuration for the Analytics Service.
+
+Uses pydantic-settings to load environment variables for database,
+review storage, confidence thresholds, and news API keys.
+"""
+
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    """Analytics service settings loaded from environment variables.
+
+    Attributes:
+        DATABASE_URL: PostgreSQL connection string.
+        REVIEW_STORAGE_PATH: Path to store reviewed CSV files.
+        LOW_CONFIDENCE_THRESHOLD: Threshold for flagging low confidence.
+        LOW_MARGIN_THRESHOLD: Threshold for flagging low margin.
+    """
     DATABASE_URL: str
 
     REVIEW_STORAGE_PATH: str

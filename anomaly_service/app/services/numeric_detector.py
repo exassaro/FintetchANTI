@@ -1,3 +1,13 @@
+"""
+Numeric Anomaly Detector.
+
+Combines Isolation Forest (slab-conditioned + global), Z-score,
+IQR range, and autoencoder reconstruction error to produce a
+composite numeric anomaly score per row.
+"""
+
+import logging
+
 import numpy as np
 import pandas as pd
 import torch
@@ -9,14 +19,30 @@ from sklearn.preprocessing import StandardScaler
 
 from .base_detector import BaseDetector
 
+logger = logging.getLogger(__name__)
+
 
 class NumericDetector(BaseDetector):
+    """Detect anomalies based on numeric feature distributions.
+
+    Uses ensemble scoring: Isolation Forest, Z-score, IQR, and
+    autoencoder reconstruction error.
+    """
 
     def __init__(self):
+        """Initialize seeds for reproducibility."""
         np.random.seed(42)
         torch.manual_seed(42)
 
     def run(self, df: pd.DataFrame):
+        """Compute composite numeric anomaly scores.
+
+        Args:
+            df: DataFrame with numeric feature columns.
+
+        Returns:
+            tuple: (numeric_score, reasons) as pandas Series.
+        """
 
         df = df.copy()
 

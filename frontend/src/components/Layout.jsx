@@ -19,6 +19,7 @@ const PAGE_TITLES = {
     '/review': { title: 'Review Queue', sub: 'Compliance' },
     '/chatbot': { title: 'AI Chatbot', sub: 'AI Assistant' },
     '/news': { title: 'Financial News', sub: 'Global Feed' },
+    '/retraining': { title: 'Model Retraining', sub: 'MLOps' },
 };
 
 export default function Layout() {

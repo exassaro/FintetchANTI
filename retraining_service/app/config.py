@@ -1,3 +1,11 @@
+"""
+Configuration module for the Retraining Service.
+
+Loads environment variables for database, MLflow, feature contract,
+storage paths, and scheduler settings. Mirrors the classification
+service's MLflow/feature configuration exactly.
+"""
+
 import os
 from dotenv import load_dotenv
 

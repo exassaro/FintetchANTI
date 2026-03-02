@@ -1,3 +1,9 @@
+"""Dashboard API endpoints for the Analytics Service.
+
+Provides summary KPIs, slab distribution, spend breakdowns,
+anomaly statistics, and monthly trend data.
+"""
+
 # app/api/dashboard.py
 
 import uuid
@@ -21,6 +27,18 @@ def _get_completed_anomaly_run(
     db: Session,
     upload_id: uuid.UUID
 ):
+    """Validate that a completed anomaly run exists for the upload.
+
+    Args:
+        db: Database session.
+        upload_id: UUID of the upload.
+
+    Returns:
+        AnomalyRun: The most recent completed anomaly run.
+
+    Raises:
+        HTTPException: 404 if no run exists, 400 if not completed.
+    """
 
     anomaly_run = (
         db.query(models.AnomalyRun)
@@ -53,6 +71,10 @@ def get_dashboard_summary(
     upload_id: uuid.UUID,
     db: Session = Depends(get_db)
 ):
+    """Get high-level dashboard KPIs for an upload.
+
+    Returns total transactions, spend, anomaly rate, and review status.
+    """
 
     anomaly_run = _get_completed_anomaly_run(db, upload_id)
 
@@ -76,6 +98,7 @@ def get_slab_distribution(
     upload_id: uuid.UUID,
     db: Session = Depends(get_db)
 ):
+    """Get GST slab distribution counts for an upload."""
 
     anomaly_run = _get_completed_anomaly_run(db, upload_id)
 
@@ -99,6 +122,7 @@ def get_slab_wise_spend(
     upload_id: uuid.UUID,
     db: Session = Depends(get_db)
 ):
+    """Get total spend broken down by GST slab."""
 
     anomaly_run = _get_completed_anomaly_run(db, upload_id)
 
@@ -122,6 +146,7 @@ def get_anomaly_statistics(
     upload_id: uuid.UUID,
     db: Session = Depends(get_db)
 ):
+    """Get anomaly severity statistics for an upload."""
 
     anomaly_run = _get_completed_anomaly_run(db, upload_id)
 
@@ -145,6 +170,7 @@ def get_monthly_trends(
     upload_id: uuid.UUID,
     db: Session = Depends(get_db)
 ):
+    """Get monthly spend and anomaly counts for an upload."""
 
     anomaly_run = _get_completed_anomaly_run(db, upload_id)
 

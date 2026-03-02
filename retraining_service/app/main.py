@@ -1,3 +1,9 @@
+"""FastAPI application entry point for the Retraining Service.
+
+Initialises database tables, optionally starts the APScheduler for
+monthly retraining CRON, and mounts the retraining API routes.
+"""
+
 import logging
 
 from contextlib import asynccontextmanager
@@ -18,6 +24,11 @@ scheduler = BackgroundScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Manage application startup and shutdown lifecycle.
+
+    On startup: creates DB tables and optionally starts the scheduler.
+    On shutdown: gracefully stops the scheduler if running.
+    """
     # Startup actions
     logger.info("Initializing Database Tables...")
     Base.metadata.create_all(bind=engine)
@@ -67,4 +78,5 @@ app.include_router(retraining_routes.router, prefix="/retraining")
 
 @app.get("/health")
 def health():
+    """Return health status for load-balancer probes."""
     return {"status": "ok", "service": "retraining"}

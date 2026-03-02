@@ -1,3 +1,13 @@
+"""
+Text-based Anomaly Detector.
+
+Uses sentence embeddings (MiniLM), KMeans clustering, kNN density,
+frequency rarity, and text length extremes to compute a composite
+NLP anomaly score per row.
+"""
+
+import logging
+
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
@@ -6,16 +16,32 @@ from sentence_transformers import SentenceTransformer
 
 from .base_detector import BaseDetector
 
+logger = logging.getLogger(__name__)
+
 
 class TextDetector(BaseDetector):
+    """Detect anomalies based on text semantics and patterns.
+
+    Uses sentence transformer embeddings, clustering distance,
+    kNN density, frequency rarity, and text length analysis.
+    """
 
     def __init__(self):
+        """Initialize the sentence transformer model."""
         np.random.seed(42)
         self.model = SentenceTransformer(
             "sentence-transformers/all-MiniLM-L6-v2"
         )
 
     def run(self, df: pd.DataFrame):
+        """Compute composite NLP anomaly scores.
+
+        Args:
+            df: DataFrame with ``text_input_clean`` column.
+
+        Returns:
+            tuple: (nlp_score, reasons) as pandas Series.
+        """
 
         if "text_input_clean" not in df.columns:
             return (

@@ -1,6 +1,13 @@
+"""FastAPI application entry point for the Analytics Service.
+
+Initialises structured logging, creates database tables, and mounts
+the analytics API routers (forecast, review, dashboard, etc.).
+"""
+
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import logging
 from app.core.logging import setup_logging
 
 from app.db.base import Base
@@ -37,4 +44,5 @@ app.include_router(news.router)
 
 @app.get("/health")
 def health():
+    """Return health status for load-balancer probes."""
     return {"status": "ok"}

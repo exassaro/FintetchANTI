@@ -1,3 +1,9 @@
+"""API routes for the Retraining Service.
+
+Exposes endpoints to trigger retraining jobs, check job status,
+and list all retraining jobs with filtering and pagination.
+"""
+
 import logging
 from uuid import UUID
 
@@ -32,6 +38,22 @@ def trigger_retraining(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
+    """Trigger retraining for one or all schemas.
+
+    Creates pending job records, then launches background retraining.
+    Skips schemas that already have a running or pending job.
+
+    Args:
+        payload: Request body with schema_type and triggered_by.
+        background_tasks: FastAPI background task manager.
+        db: Database session (injected via ``Depends``).
+
+    Returns:
+        RetrainingResponse: Message and list of job UUIDs.
+
+    Raises:
+        HTTPException: 400 if schema_type is invalid.
+    """
     schemas_to_run = []
     
     if payload.schema_type.upper() == "ALL":
@@ -96,6 +118,18 @@ def get_job_status(
     job_id: str,
     db: Session = Depends(get_db),
 ):
+    """Retrieve the status of a single retraining job.
+
+    Args:
+        job_id: UUID string of the retraining job.
+        db: Database session (injected via ``Depends``).
+
+    Returns:
+        RetrainingStatusResponse: Full job status and metrics.
+
+    Raises:
+        HTTPException: 400 on invalid UUID, 404 if not found.
+    """
     try:
         uuid_obj = UUID(job_id)
     except ValueError:
@@ -119,6 +153,16 @@ def list_jobs(
     limit: int = 20,
     db: Session = Depends(get_db),
 ):
+    """List retraining jobs, most recent first.
+
+    Args:
+        schema_type: Optional filter by schema.
+        limit: Maximum number of jobs to return. Defaults to 20.
+        db: Database session (injected via ``Depends``).
+
+    Returns:
+        RetrainingJobList: Jobs list and total count.
+    """
     query = db.query(RetrainingJob)
 
     if schema_type:

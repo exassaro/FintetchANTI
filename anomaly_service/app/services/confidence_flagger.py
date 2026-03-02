@@ -1,15 +1,41 @@
+"""
+Confidence-based Anomaly Flagger.
+
+Flags transactions where the ML classifier's prediction confidence
+is unusually low relative to the batch or the margin between top
+predictions is narrow.
+"""
+
+import logging
+
 import numpy as np
 import pandas as pd
 
 from .base_detector import BaseDetector
 
+logger = logging.getLogger(__name__)
+
 
 class ConfidenceFlagger(BaseDetector):
+    """Detect anomalies from low classification confidence.
+
+    Combines relative deviation from mean confidence and
+    narrow confidence margins between top predicted classes.
+    """
 
     def __init__(self):
+        """Initialize seeds for reproducibility."""
         np.random.seed(42)
 
     def run(self, df: pd.DataFrame):
+        """Compute composite confidence anomaly scores.
+
+        Args:
+            df: DataFrame with ``gst_confidence`` column.
+
+        Returns:
+            tuple: (confidence_score, reasons) as pandas Series.
+        """
 
         if "gst_confidence" not in df.columns:
             return (

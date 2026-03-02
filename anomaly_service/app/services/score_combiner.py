@@ -1,8 +1,29 @@
+"""
+Score Combiner for the Anomaly Detection Service.
+
+Weights and combines numeric, NLP, and confidence anomaly scores
+into a single composite score, applies adaptive thresholding,
+and aggregates detection reasons.
+"""
+
+import logging
+
 import numpy as np
 import pandas as pd
 
+logger = logging.getLogger(__name__)
+
 
 class ScoreCombiner:
+    """Combine multiple anomaly sub-scores with adaptive thresholding.
+
+    Attributes:
+        numeric_weight: Weight for numeric detector score.
+        nlp_weight: Weight for text detector score.
+        confidence_weight: Weight for confidence flagger score.
+        adaptive_quantile: Quantile for dynamic threshold.
+        min_absolute_threshold: Minimum threshold floor.
+    """
 
     def __init__(
         self,
@@ -10,8 +31,17 @@ class ScoreCombiner:
         nlp_weight=0.35,
         confidence_weight=0.25,
         adaptive_quantile=0.90,
-        min_absolute_threshold=0.40
+        min_absolute_threshold=0.40,
     ):
+        """Initialize the score combiner with configurable weights.
+
+        Args:
+            numeric_weight: Weight for numeric detector. Defaults to 0.40.
+            nlp_weight: Weight for NLP detector. Defaults to 0.35.
+            confidence_weight: Weight for confidence flagger. Defaults to 0.25.
+            adaptive_quantile: Quantile for threshold. Defaults to 0.90.
+            min_absolute_threshold: Floor threshold. Defaults to 0.40.
+        """
 
         self.numeric_weight = numeric_weight
         self.nlp_weight = nlp_weight
@@ -29,6 +59,20 @@ class ScoreCombiner:
         nlp_reasons: pd.Series = None,
         confidence_reasons: pd.Series = None,
     ):
+        """Combine sub-scores into a final anomaly determination.
+
+        Args:
+            numeric_score: Scores from the numeric detector.
+            nlp_score: Scores from the text detector.
+            confidence_score: Scores from the confidence flagger.
+            numeric_reasons: Reasons from the numeric detector.
+            nlp_reasons: Reasons from the text detector.
+            confidence_reasons: Reasons from the confidence flagger.
+
+        Returns:
+            pd.DataFrame: With columns anomaly_score, is_anomaly,
+                          adaptive_threshold_used, and anomaly_reasons.
+        """
 
         
         # Safe Initialization

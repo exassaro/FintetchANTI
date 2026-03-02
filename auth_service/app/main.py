@@ -1,3 +1,9 @@
+"""FastAPI application entry point for the Auth Service.
+
+Manages user authentication via JWT tokens, seeds a default admin
+user, and exposes the login/register/profile API routes.
+"""
+
 # app/main.py
 
 import logging
@@ -18,6 +24,10 @@ logger = logging.getLogger("auth_service")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Manage application startup and shutdown lifecycle.
+
+    On startup: creates DB tables and seeds the default admin.
+    """
     # ── Startup ──
     logger.info("Auth Service starting up...")
     Base.metadata.create_all(bind=engine)
@@ -55,4 +65,5 @@ app.include_router(auth_router)
 
 @app.get("/health")
 def health():
+    """Return health status for load-balancer probes."""
     return {"status": "ok", "service": "auth"}
