@@ -32,10 +32,10 @@ if not MLFLOW_BASE_PATH:
 # Per-schema MLflow tracking/registry URIs
 # Must match classification_service/app/core/config.py exactly
 SCHEMA_MLFLOW_URIS = {
-    "A": f"sqlite:///{MLFLOW_BASE_PATH}/desc_cat_vend/mlflow.db",
-    "B": f"sqlite:///{MLFLOW_BASE_PATH}/desc_cat/mlflow.db",
-    "C": f"sqlite:///{MLFLOW_BASE_PATH}/desc_vend/mlflow.db",
-    "D": f"sqlite:///{MLFLOW_BASE_PATH}/desc/mlflow.db",
+    "A": f"file:///{MLFLOW_BASE_PATH}/desc_cat_vend/mlruns",
+    "B": f"file:///{MLFLOW_BASE_PATH}/desc_cat/mlruns",
+    "C": f"file:///{MLFLOW_BASE_PATH}/desc_vend/mlruns",
+    "D": f"file:///{MLFLOW_BASE_PATH}/desc/mlruns",
 }
 
 # Per-schema model names in the MLflow registry
