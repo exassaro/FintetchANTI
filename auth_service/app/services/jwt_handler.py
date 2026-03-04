@@ -29,13 +29,16 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def decode_access_token(token: str) -> dict:
+def decode_access_token(token: str) -> Optional[dict]:
     """
     Decode and validate a JWT token.
-    Raises JWTError if token is invalid or expired.
+    Returns None if token is invalid or expired.
     """
-    return jwt.decode(
-        token,
-        settings.JWT_SECRET_KEY,
-        algorithms=[settings.JWT_ALGORITHM],
-    )
+    try:
+        return jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM],
+        )
+    except JWTError:
+        return None

@@ -102,21 +102,21 @@ class TestAuthSchemas:
 
     def test_user_login_schema(self):
         """Verify UserLogin schema accepts valid input."""
-        from app.schemas import UserLogin
+        from app.schemas import LoginRequest
 
-        login = UserLogin(email="test@example.com", password="pass123")
+        login = LoginRequest(email="test@example.com", password="pass123")
         assert login.email == "test@example.com"
 
     def test_user_register_schema(self):
         """Verify UserRegister schema with name field."""
-        from app.schemas import UserRegister
+        from app.schemas import RegisterRequest
 
-        reg = UserRegister(
+        reg = RegisterRequest(
             email="new@example.com",
             password="secure123",
-            name="Test User",
+            username="Test User",
         )
-        assert reg.name == "Test User"
+        assert reg.username == "Test User"
 
     def test_token_response_schema(self):
         """Verify TokenResponse schema structure."""

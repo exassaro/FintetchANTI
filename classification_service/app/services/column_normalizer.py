@@ -74,7 +74,7 @@ def normalize_columns(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
     ambiguity: Dict[str, List[str]] = {}
 
     for col in original_columns:
-        col_l = col.strip().lower()
+        col_l = col.strip().lower().replace(" ", "_")
         matched_roles = []
 
         for role, patterns in ROLE_SYNONYMS.items():
@@ -127,7 +127,7 @@ def get_detected_roles(df: pd.DataFrame) -> List[str]:
     roles = set()
 
     for col in df.columns:
-        col_l = col.strip().lower()
+        col_l = col.strip().lower().replace(" ", "_")
         for role, patterns in ROLE_SYNONYMS.items():
             if any(re.match(p, col_l) for p in patterns):
                 roles.add(role)

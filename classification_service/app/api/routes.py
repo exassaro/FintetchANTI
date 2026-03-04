@@ -82,6 +82,7 @@ async def upload_csv(
     )
 
     raw_path = os.path.join(RAW_STORAGE, raw_filename)
+    os.makedirs(RAW_STORAGE, exist_ok=True)
 
     # Save Raw File
     try:
@@ -142,6 +143,7 @@ async def upload_csv(
         )
 
         classified_path = os.path.join(CLASSIFIED_STORAGE, classified_filename)
+        os.makedirs(CLASSIFIED_STORAGE, exist_ok=True)
 
         # Preprocess
         df_processed = preprocess(df, schema)

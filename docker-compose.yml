@@ -1,0 +1,178 @@
+# ================================================================
+# FintechAnti — Docker Compose (Local Development)
+# ================================================================
+# Orchestrates all 6 microservices + PostgreSQL for local testing.
+#
+# Usage:
+#   docker-compose up --build          (build & start all)
+#   docker-compose up --build -d       (detached mode)
+#   docker-compose down -v             (stop & remove volumes)
+#   docker-compose logs -f analytics   (tail logs for one service)
+# ================================================================
+
+# ── Shared network ──────────────────────────────────────────
+networks:
+  fintechanti-net:
+    driver: bridge
+
+# ── Persistent volumes ─────────────────────────────────────
+volumes:
+  pgdata:
+  storage-data:
+
+    # ── Services ───────────────────────────────────────────────
+services:
+
+  # ── PostgreSQL Database ─────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: fintechanti-postgres
+    environment:
+      POSTGRES_DB: gst_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - fintechanti-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d gst_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Classification Service (port 8001) ──────────────────
+  classification:
+    build:
+      context: ./classification_service
+      dockerfile: Dockerfile
+    container_name: fintechanti-classification
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
+      MLFLOW_BASE_PATH: /models
+      HSN_LOOKUP_PATH: /app/data/hsn_lookup.csv
+      RAW_STORAGE: /storage/raw
+      CLASSIFIED_STORAGE: /storage/classified
+    volumes:
+      - storage-data:/storage
+      - ../Models/Training:/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fintechanti-net
+    restart: unless-stopped
+
+  # ── Anomaly Service (port 8002) ─────────────────────────
+  anomaly:
+    build:
+      context: ./anomaly_service
+      dockerfile: Dockerfile
+    container_name: fintechanti-anomaly
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
+      CLASSIFIED_STORAGE_PATH: /storage/classified
+      ANOMALY_STORAGE_PATH: /storage/anomaly
+    volumes:
+      - storage-data:/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fintechanti-net
+    restart: unless-stopped
+
+  # ── Analytics Service (port 8003) ───────────────────────
+  analytics:
+    build:
+      context: ./analytics_service
+      dockerfile: Dockerfile
+    container_name: fintechanti-analytics
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
+      REVIEW_STORAGE_PATH: /storage/reviews
+      LOW_CONFIDENCE_THRESHOLD: "0.75"
+      LOW_MARGIN_THRESHOLD: "0.10"
+      NEWS_API_KEY: "${NEWS_API_KEY:-}"
+      NEWSDATA_API_KEY: "${NEWSDATA_API_KEY:-}"
+      MEDIASTACK_API_KEY: "${MEDIASTACK_API_KEY:-}"
+    volumes:
+      - storage-data:/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fintechanti-net
+    restart: unless-stopped
+
+  # ── Auth Service (port 8004) ────────────────────────────
+  auth:
+    build:
+      context: ./auth_service
+      dockerfile: Dockerfile
+    container_name: fintechanti-auth
+    ports:
+      - "8004:8004"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY:-f1nt3ch-ant1-s3cr3t-k3y-dev}"
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-warrenbuff@gmail.com}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-warreN$2024}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fintechanti-net
+    restart: unless-stopped
+
+  # ── Retraining Service (port 8005) ──────────────────────
+  retraining:
+    build:
+      context: ./retraining_service
+      dockerfile: Dockerfile
+    container_name: fintechanti-retraining
+    ports:
+      - "8005:8005"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
+      MLFLOW_BASE_PATH: /models
+      STORAGE_PATH: /storage
+      ENABLE_SCHEDULER: "false"
+    volumes:
+      - storage-data:/storage
+      - ../Models/Training:/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fintechanti-net
+    restart: unless-stopped
+
+  # ── Frontend (port 3000 → nginx:80) ────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fintechanti-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - classification
+      - anomaly
+      - analytics
+      - auth
+      - retraining
+    networks:
+      - fintechanti-net
+    restart: unless-stopped

@@ -23,6 +23,7 @@ class TestSchemaDetector:
         from app.services.schema_detector import detect_schema
 
         df = pd.DataFrame({
+            "amount": [100],
             "description": ["item"],
             "category": ["office"],
             "vendor_name": ["vendor1"],
@@ -34,6 +35,7 @@ class TestSchemaDetector:
         from app.services.schema_detector import detect_schema
 
         df = pd.DataFrame({
+            "amount": [100],
             "description": ["item"],
             "category": ["office"],
         })
@@ -96,10 +98,10 @@ class TestPreprocessing:
         s = pd.Series(["hello", "", "   ", None, "valid"])
         result = is_effectively_nonempty_text(s)
 
-        assert result.iloc[0] is True
-        assert result.iloc[1] is False
-        assert result.iloc[2] is False
-        assert result.iloc[4] is True
+        assert result.iloc[0] == True
+        assert result.iloc[1] == False
+        assert result.iloc[2] == False
+        assert result.iloc[4] == True
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +122,7 @@ class TestColumnNormalizer:
             "Vendor Name": ["v1"],
         })
 
-        normalized = normalize_columns(df)
+        normalized, _ = normalize_columns(df)
 
         assert "description" in normalized.columns
         assert "amount" in normalized.columns
@@ -135,7 +137,7 @@ class TestColumnNormalizer:
             "amount": [500.50],
         })
 
-        normalized = normalize_columns(df)
+        normalized, _ = normalize_columns(df)
 
         assert normalized["description"].iloc[0] == "test item"
         assert normalized["amount"].iloc[0] == 500.50

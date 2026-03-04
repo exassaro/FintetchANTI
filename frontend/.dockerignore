@@ -1,0 +1,29 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Build output (we build inside Docker)
+dist/
+dist-ssr/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Git
+.git/
+.gitignore

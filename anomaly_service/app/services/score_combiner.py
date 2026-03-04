@@ -78,14 +78,13 @@ class ScoreCombiner:
         # Safe Initialization
         
 
-        n = len(
-            numeric_score
-            if numeric_score is not None
-            else (
-                nlp_score if nlp_score is not None
-                else confidence_score
-            )
-        )
+        n = 0
+        if numeric_score is not None:
+            n = len(numeric_score)
+        elif nlp_score is not None:
+            n = len(nlp_score)
+        elif confidence_score is not None:
+            n = len(confidence_score)
 
         if numeric_score is None:
             numeric_score = pd.Series(0.0, index=range(n))

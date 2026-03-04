@@ -11,3 +11,5 @@ statsmodels
 scikit-learn
 python-multipart
 plotly
+groq
+httpx
