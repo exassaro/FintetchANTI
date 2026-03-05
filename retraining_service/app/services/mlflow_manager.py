@@ -8,21 +8,30 @@ available for inference.
 Classification service loads models via:
     mlflow.set_tracking_uri(SCHEMA_MLFLOW_URIS[schema])
     mlflow.set_registry_uri(SCHEMA_MLFLOW_URIS[schema])
-    mlflow.sklearn.load_model(f"models:/{model_name}/Production")
+    # Resolves artifact path from run_id to avoid Windows-path issues
 """
 
 import logging
+from pathlib import Path
 
 import mlflow
 import mlflow.sklearn
 from mlflow.tracking import MlflowClient
 
-from app.config import SCHEMA_MLFLOW_URIS, SCHEMA_MODEL_NAMES
+from app.config import MLFLOW_BASE_PATH, SCHEMA_MLFLOW_URIS, SCHEMA_MODEL_NAMES
 
 logger = logging.getLogger(__name__)
 
 # Minimum F1 improvement required for promotion (prevents noise promotions)
 PROMOTION_THRESHOLD = 0.01
+
+# Maps schema letter to its sub-directory under MLFLOW_BASE_PATH
+_SCHEMA_SUBDIRS = {
+    "A": "desc_cat_vend",
+    "B": "desc_cat",
+    "C": "desc_vend",
+    "D": "desc",
+}
 
 
 def _get_tracking_uri(schema_type: str) -> str:
@@ -37,6 +46,62 @@ def _get_model_name(schema_type: str) -> str:
     if not name:
         raise ValueError(f"No model name for schema '{schema_type}'")
     return name
+
+
+def _resolve_artifact_path(schema_type: str, run_id: str) -> str:
+    """Build the local artifact path for a model from its run_id.
+
+    Avoids hardcoded Windows paths stored in MLflow registry metadata.
+    """
+    subdir = _SCHEMA_SUBDIRS[schema_type]
+    mlruns_root = Path(MLFLOW_BASE_PATH) / subdir / "mlruns"
+
+    for entry in mlruns_root.iterdir():
+        if not entry.is_dir() or entry.name in {"models", ".trash", "0"}:
+            continue
+        candidate = entry / run_id / "artifacts" / "model"
+        if candidate.exists():
+            return str(candidate)
+
+    for entry in mlruns_root.iterdir():
+        if not entry.is_dir():
+            continue
+        candidate = entry / run_id / "artifacts" / "model"
+        if candidate.exists():
+            return str(candidate)
+
+    raise FileNotFoundError(
+        f"Could not find model artifacts for run '{run_id}' under {mlruns_root}"
+    )
+
+
+def fetch_production_model(schema_type: str):
+    """
+    Fetch the Production model for the given schema type from MLflow.
+    Returns the loaded scikit-learn model, or None if no Production model exists.
+    """
+    tracking_uri = _get_tracking_uri(schema_type)
+    model_name = _get_model_name(schema_type)
+
+    mlflow.set_tracking_uri(tracking_uri)
+    mlflow.set_registry_uri(tracking_uri)
+
+    client = MlflowClient(tracking_uri=tracking_uri, registry_uri=tracking_uri)
+
+    try:
+        prod_versions = client.get_latest_versions(model_name, stages=["Production"])
+        if not prod_versions:
+            logger.info(f"No Production model found for {model_name}.")
+            return None
+
+        run_id = prod_versions[0].run_id
+        artifact_path = _resolve_artifact_path(schema_type, run_id)
+        logger.info(f"Loading Production model from {artifact_path}")
+        model = mlflow.sklearn.load_model(artifact_path)
+        return model
+    except Exception as e:
+        logger.warning(f"Could not fetch Production model for {schema_type}: {e}")
+        return None
 
 
 def log_and_maybe_promote(schema_type: str, model, metrics: dict):

@@ -71,19 +71,23 @@ class TestEvaluator:
 class TestTrainer:
     """Tests for the model training module."""
 
-    def test_train_model_raises_on_missing_columns(self):
+    @patch("app.services.trainer.fetch_production_model")
+    def test_train_model_raises_on_missing_columns(self, mock_fetch):
         """Verify ValueError is raised when required columns are missing."""
         from app.services.trainer import train_model
 
+        mock_fetch.return_value = None
         df = pd.DataFrame({"something_else": [1, 2, 3]})
 
         with pytest.raises(ValueError, match="missing required columns"):
             train_model(df, "A")
 
-    def test_train_model_raises_on_insufficient_data(self):
+    @patch("app.services.trainer.fetch_production_model")
+    def test_train_model_raises_on_insufficient_data(self, mock_fetch):
         """Verify ValueError when fewer than 10 valid rows exist."""
         from app.services.trainer import train_model
 
+        mock_fetch.return_value = None
         df = pd.DataFrame({
             "text_input_clean": ["hello"] * 5,
             "amount": [100] * 5,
@@ -96,10 +100,12 @@ class TestTrainer:
         with pytest.raises(ValueError, match="Insufficient data"):
             train_model(df, "A")
 
-    def test_train_model_succeeds_with_valid_data(self):
+    @patch("app.services.trainer.fetch_production_model")
+    def test_train_model_succeeds_with_valid_data(self, mock_fetch):
         """Verify training succeeds with sufficient valid data."""
         from app.services.trainer import train_model
 
+        mock_fetch.return_value = None
         np.random.seed(42)
         n = 50
         df = pd.DataFrame({

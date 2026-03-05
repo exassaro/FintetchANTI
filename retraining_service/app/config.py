@@ -7,9 +7,21 @@ service's MLflow/feature configuration exactly.
 """
 
 import os
+from pathlib import Path
+from urllib.request import pathname2url
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def _build_mlflow_file_uri(base_path: str, subdir: str) -> str:
+    """Build a correct file:// URI for MLflow on any OS.
+
+    - Linux  : base_path = /models      -> file:///models/<subdir>/mlruns
+    - Windows: base_path = C:/Users/...  -> file:///C:/Users/.../<subdir>/mlruns
+    """
+    full = str(Path(base_path) / subdir / "mlruns")
+    return "file://" + pathname2url(full)
 
 
 # ==========================================================
@@ -32,10 +44,10 @@ if not MLFLOW_BASE_PATH:
 # Per-schema MLflow tracking/registry URIs
 # Must match classification_service/app/core/config.py exactly
 SCHEMA_MLFLOW_URIS = {
-    "A": f"file:///{MLFLOW_BASE_PATH}/desc_cat_vend/mlruns",
-    "B": f"file:///{MLFLOW_BASE_PATH}/desc_cat/mlruns",
-    "C": f"file:///{MLFLOW_BASE_PATH}/desc_vend/mlruns",
-    "D": f"file:///{MLFLOW_BASE_PATH}/desc/mlruns",
+    "A": _build_mlflow_file_uri(MLFLOW_BASE_PATH, "desc_cat_vend"),
+    "B": _build_mlflow_file_uri(MLFLOW_BASE_PATH, "desc_cat"),
+    "C": _build_mlflow_file_uri(MLFLOW_BASE_PATH, "desc_vend"),
+    "D": _build_mlflow_file_uri(MLFLOW_BASE_PATH, "desc"),
 }
 
 # Per-schema model names in the MLflow registry

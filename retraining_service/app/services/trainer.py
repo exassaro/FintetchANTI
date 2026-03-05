@@ -17,6 +17,7 @@ So the retrained model must accept the same DataFrame shape.
 import logging
 
 import pandas as pd
+from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -25,6 +26,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from app.config import TEXT_FEATURE, NUMERIC_FEATURES, LABEL_COLUMN
+from app.services.mlflow_manager import fetch_production_model
 
 logger = logging.getLogger(__name__)
 
@@ -85,20 +87,28 @@ def train_model(
         random_state=42,
     )
 
-    # Build pipeline matching the inference feature contract
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ("text", TfidfVectorizer(max_features=5000), TEXT_FEATURE),
-            ("numeric", StandardScaler(), NUMERIC_FEATURES),
-        ],
-        remainder="drop",
-        n_jobs=-1
-    )
+    # Attempt to fetch the production model to reuse its architecture
+    prod_model = fetch_production_model(schema_type)
+    if prod_model is not None:
+        logger.info(f"Dynamically rebuilding pipeline based on Production model for {schema_type}")
+        # clone creates an unfitted model with the exact same parameters
+        pipeline = clone(prod_model)
+    else:
+        logger.info(f"No Production model found. Falling back to default LogisticRegression pipeline for {schema_type}")
+        # Build pipeline matching the inference feature contract
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ("text", TfidfVectorizer(max_features=5000), TEXT_FEATURE),
+                ("numeric", StandardScaler(), NUMERIC_FEATURES),
+            ],
+            remainder="drop",
+            n_jobs=-1
+        )
 
-    pipeline = Pipeline([
-        ("features", preprocessor),
-        ("clf", LogisticRegression(max_iter=250, solver="lbfgs", n_jobs=-1)),
-    ])
+        pipeline = Pipeline([
+            ("features", preprocessor),
+            ("clf", LogisticRegression(max_iter=250, solver="lbfgs", n_jobs=-1)),
+        ])
 
     pipeline.fit(X_train, y_train)
 
