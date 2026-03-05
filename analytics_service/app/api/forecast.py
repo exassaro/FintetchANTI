@@ -1,14 +1,12 @@
 # app/api/forecast.py
 
 import uuid
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.services.forecast_engine import ForecastEngine
-from app.db.models import ReviewDecision  # only for existence validation
 from app.db import models
 
 router = APIRouter(prefix="/forecast", tags=["Forecast"])

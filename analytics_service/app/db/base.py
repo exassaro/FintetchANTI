@@ -5,4 +5,3 @@ class Base(DeclarativeBase):
     pass
 
 
-from app.db import models

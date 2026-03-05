@@ -130,7 +130,7 @@ def download_reviewed_file(
     db: Session = Depends(get_db)
 ):
 
-    anomaly_run = _get_completed_anomaly_run(db, upload_id)
+    _get_completed_anomaly_run(db, upload_id)
 
     reviewed_path = review_engine.get_reviewed_csv_path(upload_id)
 

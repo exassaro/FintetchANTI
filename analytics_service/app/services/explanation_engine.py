@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 
 from app.services.csv_reader import CSVReader
 from app.db.models import LLMExplanation
-from app.config import settings
 
 
 # Replace with your LLM provider wrapper

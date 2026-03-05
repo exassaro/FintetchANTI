@@ -95,7 +95,6 @@ def get_financial_kpis(
 
     net_gst_payable_raw = total_gst_liability - total_itc
     net_gst_payable = round(max(net_gst_payable_raw, 0.0), 2)
-    carry_forward_itc = round(abs(net_gst_payable_raw) if net_gst_payable_raw < 0 else 0.0, 2)
 
     effective_tax_rate = (
         total_gst_liability / total_expenses

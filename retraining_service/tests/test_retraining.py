@@ -6,7 +6,6 @@ config, schemas, API routes, and MLflow manager.
 """
 
 import uuid
-from datetime import datetime
 from unittest.mock import patch, MagicMock
 
 import numpy as np

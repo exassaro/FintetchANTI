@@ -6,7 +6,6 @@ versioning, and promotion results.
 """
 
 import uuid
-from datetime import datetime
 
 from sqlalchemy import Column, String, Boolean, Text, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID, JSONB

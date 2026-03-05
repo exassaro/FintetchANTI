@@ -43,7 +43,6 @@ class TestScoreCombiner:
         from app.services.score_combiner import ScoreCombiner
 
         combiner = ScoreCombiner(min_absolute_threshold=0.3)
-        n = 5
 
         result = combiner.combine(
             numeric_score=pd.Series([0.9, 0.9, 0.1, 0.1, 0.1]),

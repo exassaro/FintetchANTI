@@ -7,7 +7,6 @@ and configuration constants.
 
 import numpy as np
 import pandas as pd
-import pytest
 
 
 # ---------------------------------------------------------------------------
@@ -97,11 +96,10 @@ class TestPreprocessing:
 
         s = pd.Series(["hello", "", "   ", None, "valid"])
         result = is_effectively_nonempty_text(s)
-
-        assert result.iloc[0] == True
-        assert result.iloc[1] == False
-        assert result.iloc[2] == False
-        assert result.iloc[4] == True
+        assert result.iloc[0]
+        assert not result.iloc[1]
+        assert not result.iloc[2]
+        assert result.iloc[4]
 
 
 # ---------------------------------------------------------------------------

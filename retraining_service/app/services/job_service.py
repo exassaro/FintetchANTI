@@ -10,7 +10,6 @@ response is sent, so background tasks MUST NOT reuse it.
 """
 
 import logging
-import traceback
 from datetime import datetime
 
 from sqlalchemy.orm import Session

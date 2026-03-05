@@ -10,7 +10,6 @@ load the model directly from the file system.
 """
 
 import logging
-import os
 from pathlib import Path
 
 import mlflow

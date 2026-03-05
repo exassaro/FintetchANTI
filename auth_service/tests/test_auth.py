@@ -6,9 +6,7 @@ Pydantic schemas, and configuration validation.
 """
 
 from datetime import timedelta
-from unittest.mock import patch
 
-import pytest
 
 
 # ---------------------------------------------------------------------------

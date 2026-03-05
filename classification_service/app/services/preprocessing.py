@@ -63,7 +63,6 @@ def preprocess(df: pd.DataFrame, schema_type: str) -> pd.DataFrame:
     """
 
     df = df.copy()
-    original_columns = list(df.columns)
 
     columns = set(df.columns)
 

@@ -78,7 +78,7 @@ class AggregationEngine:
 
         # Calculate remaining queue by recreating the review engine's queue criteria
         queue_mask = (
-            (df["is_anomaly"] == True)
+            (df["is_anomaly"])
             | (df["gst_confidence"] < settings.LOW_CONFIDENCE_THRESHOLD)
             | (df["gst_confidence_margin"] < settings.LOW_MARGIN_THRESHOLD)
         )
@@ -163,7 +163,7 @@ class AggregationEngine:
         )
         low = int(
             ((df["anomaly_score"] < 0.50) &
-             (df["is_anomaly"] == True)).sum()
+             (df["is_anomaly"])).sum()
         )
 
         result = {

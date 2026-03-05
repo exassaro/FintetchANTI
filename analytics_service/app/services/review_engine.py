@@ -208,7 +208,7 @@ class ReviewEngine:
         gst_margin = df.get("gst_confidence_margin", pd.Series([1.0] * len(df)))
 
         mask = (
-            (is_anomaly == True)
+            (is_anomaly)
             | (gst_conf < settings.LOW_CONFIDENCE_THRESHOLD)
             | (gst_margin < settings.LOW_MARGIN_THRESHOLD)
         )
@@ -231,8 +231,8 @@ class ReviewEngine:
         )
 
         if filter_type == "anomaly":
-            review_df = review_df[review_df.get("is_anomaly", pd.Series([False] * len(review_df))) == True]
+            review_df = review_df[review_df.get("is_anomaly", pd.Series([False] * len(review_df)))]
         elif filter_type == "low_confidence":
-            review_df = review_df[review_df.get("is_anomaly", pd.Series([False] * len(review_df))) != True]
+            review_df = review_df[~review_df.get("is_anomaly", pd.Series([False] * len(review_df)))]
 
         return json.loads(review_df.to_json(orient="records"))

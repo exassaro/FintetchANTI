@@ -14,7 +14,6 @@ from statsmodels.tools.sm_exceptions import ConvergenceWarning
 
 from app.services.csv_reader import CSVReader
 from app.services.cache_manager import CacheManager
-from app.config import settings
 
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
@@ -114,12 +113,6 @@ class ForecastEngine:
             return cached
 
         # Minimal required columns
-        required_cols = [
-            "amount",
-            "gst_slab_final",
-            "gst_slab_predicted",
-            "numeric_anomaly_candidate",
-        ]
 
         df = self.csv_reader.load_dataframe(
             upload_id,
