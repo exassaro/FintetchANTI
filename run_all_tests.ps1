@@ -1,3 +1,4 @@
+
 # ====================================================================
 # Script: run_all_tests.ps1
 # Purpose: Runs pytest and ruff for all Python microservices locally, 
@@ -30,7 +31,8 @@ foreach ($service in $services) {
         try {
             ruff check .
             Write-Host "     [+] Ruff Linting Passed" -ForegroundColor Green
-        } catch {
+        }
+        catch {
             Write-Host "     [-] Ruff Linting Failed" -ForegroundColor Red
             $HasErrors = $true
         }
@@ -44,19 +46,23 @@ foreach ($service in $services) {
             $process = Start-Process -FilePath "pytest" -Wait -NoNewWindow -PassThru
             if ($process.ExitCode -eq 0) {
                 Write-Host "     [+] Pytest Passed" -ForegroundColor Green
-            } elseif ($process.ExitCode -eq 5) {
-               Write-Host "     [~] No tests were found for $service" -ForegroundColor DarkYellow
-            } else {
+            }
+            elseif ($process.ExitCode -eq 5) {
+                Write-Host "     [~] No tests were found for $service" -ForegroundColor DarkYellow
+            }
+            else {
                 Write-Host "     [-] Pytest Failed (Exit Code: $($process.ExitCode))" -ForegroundColor Red
                 $HasErrors = $true
             }
-        } catch {
+        }
+        catch {
             Write-Host "     [-] Pytest command error" -ForegroundColor Red
             $HasErrors = $true
         }
 
         Pop-Location
-    } else {
+    }
+    else {
         Write-Host "`n>> directory '$service' not found!" -ForegroundColor Red
     }
 }
@@ -68,7 +74,8 @@ if (Test-Path "frontend") {
     try {
         npm run lint --if-present
         Write-Host "     [+] Frontend Linting (if any) Passed" -ForegroundColor Green
-    } catch {
+    }
+    catch {
         Write-Host "     [-] Frontend Linting Failed" -ForegroundColor Red
         $HasErrors = $true
     }
@@ -78,6 +85,7 @@ if (Test-Path "frontend") {
 if ($HasErrors) {
     Write-Host "`n[ FAIL ] Local tests finished with errors. Please fix them prior to pushing to CI." -ForegroundColor Red
     exit 1
-} else {
+}
+else {
     Write-Host "`n[ PASS ] All local checks passed successfully!" -ForegroundColor Green
 }

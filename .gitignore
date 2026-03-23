@@ -62,8 +62,14 @@ FintechAnti_Project_Report.html
 Auditron_Architecture_Documentation.pdf
 Auditron_Project_Report.pdf
 FintechAnti_Project_Report.pdf
+ARCHITECTURE_AND_DEPLOYMENT.md
 
 # Logs and linter outputs
 lint_output.txt
 lint_output_ascii.txt
-ruff_errors.txt
+ruff_errors.txt
+
+run_all_tests.ps1
+start_services.ps1
+
+scripts/
