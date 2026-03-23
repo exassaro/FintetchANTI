@@ -54,3 +54,16 @@ Thumbs.db
 
 # Storage directory (user generated content / raw CSVs)
 storage/
+
+# Generated documentation and reports
+Auditron_Architecture_Documentation.html
+Auditron_Project_Report.html
+FintechAnti_Project_Report.html
+Auditron_Architecture_Documentation.pdf
+Auditron_Project_Report.pdf
+FintechAnti_Project_Report.pdf
+
+# Logs and linter outputs
+lint_output.txt
+lint_output_ascii.txt
+ruff_errors.txt

@@ -1,41 +1,70 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-.venv/
-env/
-.env
+# ── .dockerignore for anomaly_service ───────────────────────────────────────
+# Keeps build context lean by excluding anything not needed in the image.
 
-# Testing
-.pytest_cache/
-htmlcov/
-.coverage
+# Git & CI
+.git
+.gitignore
+.github
+.dockerignore
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Python byte-code & caches
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.cache
+.mypy_cache
+.ruff_cache
+.pytest_cache
 
-# OS
+# Virtual environments
+.venv
+venv
+env
+ENV
+
+# Editor / IDE configs
+.vscode
+.idea
+*.code-workspace
+
+# Tests (not needed at runtime)
+tests/
+**/test_*.py
+**/*_test.py
+
+# ML model files – models are downloaded at runtime, NOT baked into the image
+*.bin
+*.pt
+*.pth
+*.onnx
+*.safetensors
+models/
+mlruns/
+mlartifacts/
+
+# Data files
+*.csv
+*.parquet
+*.json
+*.jsonl
+*.pkl
+*.pickle
+data/
+
+# Logs & temp files
+*.log
+logs/
+tmp/
+temp/
+
+# OS noise
 .DS_Store
 Thumbs.db
 
-# Docker
-Dockerfile
-.dockerignore
+# Documentation (not needed in the image)
+*.md
+docs/
 
-# Git
-.git/
-.gitignore
-
-# ML artifacts (mounted as volumes in production)
-mlruns/
-*.pkl
-*.model
-
-# Data
-storage/
+# Node (if any stray files exist)
+node_modules/
