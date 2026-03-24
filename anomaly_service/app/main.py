@@ -6,6 +6,7 @@ mounts the anomaly detection API routes.
 """
 
 import logging
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,7 +27,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://fintetch-anti.vercel.app")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

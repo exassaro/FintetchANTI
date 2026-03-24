@@ -7,6 +7,7 @@ user, and exposes the login/register/profile API routes.
 # app/main.py
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -54,7 +55,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://fintetch-anti.vercel.app")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
