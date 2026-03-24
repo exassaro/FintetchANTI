@@ -60,7 +60,7 @@ services:
       CLASSIFIED_STORAGE: /storage/classified
     volumes:
       - storage-data:/storage
-      - ../Models/Training:/models
+      - ./Models/Training:/models
     depends_on:
       postgres:
         condition: service_healthy
@@ -149,7 +149,7 @@ services:
       ENABLE_SCHEDULER: "false"
     volumes:
       - storage-data:/storage
-      - ../Models/Training:/models
+      - ./Models/Training:/models
     depends_on:
       postgres:
         condition: service_healthy
