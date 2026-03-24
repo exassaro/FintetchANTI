@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// With Vite proxy, /api/anomaly/* is forwarded to http://localhost:8002 (prefix stripped)
+// With Vite proxy, /api/anomaly/* is forwarded to the anomaly service (prefix stripped)
 export const runAnomalyDetection = async (uploadId) => {
     const res = await axios.post(`/api/anomaly/run/${uploadId}`);
     return res.data;

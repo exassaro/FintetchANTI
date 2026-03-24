@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// With Vite proxy, /api/classify/* is forwarded to http://localhost:8001 (prefix stripped)
+// With Vite proxy, /api/classify/* is forwarded to the classification service (prefix stripped)
 export const uploadCSV = async (file, onUploadProgress) => {
     const formData = new FormData();
     formData.append('file', file);

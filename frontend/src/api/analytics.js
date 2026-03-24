@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // All analytics calls go through /api/* — Vite proxy strips the prefix
-// and forwards to http://localhost:8003
+// and forwards to the analytics service
 
 // ── Dashboard ──────────────────────────────────────────────
 export const getDashboardSummary = (uploadId) =>
