@@ -1,10 +1,12 @@
 import axios from 'axios';
 
-// With Vite proxy, /api/classify/* is forwarded to the classification service (prefix stripped)
+const CLASSIFICATION_URL = import.meta.env.VITE_CLASSIFICATION_URL || 'http://localhost:8001';
+
+// Direct calls to the classification service (no proxy needed in production)
 export const uploadCSV = async (file, onUploadProgress) => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await axios.post('/api/classify/upload', formData, {
+    const res = await axios.post(`${CLASSIFICATION_URL}/classify/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress,
     });
@@ -12,6 +14,6 @@ export const uploadCSV = async (file, onUploadProgress) => {
 };
 
 export const getClassificationStatus = async (uploadId) => {
-    const res = await axios.get(`/api/classify/status/${uploadId}`);
+    const res = await axios.get(`${CLASSIFICATION_URL}/classify/status/${uploadId}`);
     return res.data;
 };

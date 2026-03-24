@@ -1,19 +1,21 @@
 import axios from 'axios';
 
+const RETRAINING_URL = import.meta.env.VITE_RETRAINING_URL || 'http://localhost:8005';
+
 // ── Trigger ────────────────────────────────────────────────
 export const triggerRetraining = (schemaType, triggeredBy = 'manual') =>
-    axios.post('/api/retraining/trigger', {
+    axios.post(`${RETRAINING_URL}/retraining/trigger`, {
         schema_type: schemaType,
         triggered_by: triggeredBy,
     }).then(r => r.data);
 
 // ── Job Status ─────────────────────────────────────────────
 export const getRetrainingJobStatus = (jobId) =>
-    axios.get(`/api/retraining/status/${jobId}`).then(r => r.data);
+    axios.get(`${RETRAINING_URL}/retraining/status/${jobId}`).then(r => r.data);
 
 // ── Job History ────────────────────────────────────────────
 export const getRetrainingJobs = (schemaType = null, limit = 50) =>
-    axios.get('/api/retraining/jobs', {
+    axios.get(`${RETRAINING_URL}/retraining/jobs`, {
         params: {
             ...(schemaType ? { schema_type: schemaType } : {}),
             limit,
@@ -22,4 +24,4 @@ export const getRetrainingJobs = (schemaType = null, limit = 50) =>
 
 // ── Health ─────────────────────────────────────────────────
 export const getRetrainingHealth = () =>
-    axios.get('/api/health').then(r => r.data);
+    axios.get(`${RETRAINING_URL}/health`).then(r => r.data);
