@@ -31,4 +31,11 @@ export default defineConfig([
       'react-hooks/preserve-manual-memoization': 'off',
     },
   },
+  // vite.config.js runs in Node.js — needs Node globals (process, __dirname, etc.)
+  {
+    files: ['vite.config.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])
