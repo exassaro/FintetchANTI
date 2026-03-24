@@ -52,6 +52,8 @@ services:
     container_name: fintechanti-classification
     ports:
       - "8001:8001"
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
       MLFLOW_BASE_PATH: /models
@@ -76,6 +78,8 @@ services:
     container_name: fintechanti-anomaly
     ports:
       - "8002:8002"
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
       CLASSIFIED_STORAGE_PATH: /storage/classified
@@ -142,6 +146,8 @@ services:
     container_name: fintechanti-retraining
     ports:
       - "8005:8005"
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/gst_db
       MLFLOW_BASE_PATH: /models
