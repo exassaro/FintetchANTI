@@ -68,3 +68,4 @@ app.include_router(auth_router)
 def health():
     """Return health status for load-balancer probes."""
     return {"status": "ok", "service": "auth"}
+

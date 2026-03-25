@@ -47,3 +47,9 @@ app.include_router(news.router)
 def health():
     """Return health status for load-balancer probes."""
     return {"status": "ok"}
+
+
+
+
+
+    
