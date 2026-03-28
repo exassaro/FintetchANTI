@@ -1,10 +1,10 @@
-# Auditron
+# FintechAnti
 
 ## Project Completion Report
 
 | | |
 |---|---|
-| **Project Name** | Auditron -- GST Classification and Anomaly Detection for Indian SMEs |
+| **Project Name** | FintechAnti -- GST Classification and Anomaly Detection for Indian SMEs |
 | **Report Type** | Project Completion Report |
 | **Project Duration** | January 2026 -- March 2026 (10 Weeks) |
 | **Project Lead** | Muhammed Shahinsha |
@@ -36,7 +36,7 @@
 
 ## Executive Summary
 
-Auditron is a production-grade analytics platform that automates Goods and Services Tax (GST) classification for Indian Small and Medium Enterprises (SMEs). The system processes raw transaction CSV data through a multi-stage machine learning pipeline to predict GST slab brackets (0%, 5%, 18%, 40%), detects financial anomalies using an ensemble of statistical, deep-learning, and NLP techniques, and provides a human-in-the-loop review queue for expert oversight and continuous model improvement.
+FintechAnti is a production-grade analytics platform que automates Goods and Services Tax (GST) classification for Indian Small and Medium Enterprises (SMEs). The system processes raw transaction CSV data through a multi-stage machine learning pipeline to predict GST slab brackets (0%, 5%, 18%, 40%), detects financial anomalies using an ensemble of statistical, deep-learning, and NLP techniques, and provides a human-in-the-loop review queue for expert oversight and continuous model improvement.
 
 **Problem Statement.** Indian SMEs spend over 40 hours monthly on manual GST classification of thousands of heterogeneous transactions, resulting in misclassification penalties and compliance risk.
 
@@ -675,7 +675,7 @@ The system inspects normalized column names and assigns a schema type:
 
 ### Project Success
 
-Auditron has been successfully delivered as a comprehensive, production-grade platform addressing the critical need for automated GST compliance in Indian SMEs. All six microservices are fully operational, containerized, and governed by automated CI/CD.
+FintechAnti has been successfully delivered as a comprehensive, production-grade platform addressing the critical need for automated GST compliance in Indian SMEs. All six microservices are fully operational, containerized, and governed by automated CI/CD.
 
 ### Business Value
 

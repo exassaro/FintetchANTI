@@ -26,7 +26,7 @@ export default function Layout() {
     const location = useLocation();
     const { uploadId } = usePipeline();
     const { user, logout } = useAuth();
-    const meta = PAGE_TITLES[location.pathname] || { title: 'Auditron', sub: '' };
+    const meta = PAGE_TITLES[location.pathname] || { title: 'FintechAnti', sub: '' };
 
     const [isDark, setIsDark] = useState(() => {
         return localStorage.getItem('app-theme') === 'dark' || document.documentElement.getAttribute('data-theme') === 'dark';

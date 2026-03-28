@@ -12,7 +12,7 @@
 FROM python:3.10-slim
 
 # ── Metadata ─────────────────────────────────────────────────────────────────
-LABEL maintainer="Auditron" \
+LABEL maintainer="FintechAnti" \
       service="anomaly_service" \
       version="1.0"
 

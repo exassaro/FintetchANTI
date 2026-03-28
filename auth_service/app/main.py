@@ -48,14 +48,14 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Auditron Auth Service",
+    title="FintechAnti Auth Service",
     version="1.0.0",
     lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://auditron.vercel.app")],
+    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://fintetch-anti.vercel.app")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

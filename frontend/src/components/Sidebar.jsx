@@ -73,7 +73,7 @@ export default function Sidebar() {
                 <div className="logo-mark">
                     <div className="logo-icon"><img src={logoUrl} alt="Logo" style={{ width: 50, height: 50, objectFit: 'contain' }} /></div>
                     <div className="logo-text">
-                        <span className="logo-name">Auditron</span>
+                        <span className="logo-name">FintechAnti</span>
                         <span className="logo-tagline">SME Audit Platform</span>
                     </div>
                 </div>

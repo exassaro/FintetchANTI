@@ -2,7 +2,7 @@
 
 Financial transaction processing is fundamentally challenged by the massive volume of unstandardized data, the complexity of dynamic taxation slabs (GST at 0%, 5%, 18%, 40%), and an inherently high rate of human error. Traditional compliance workflows rely on post-facto manual effort, creating significant bottlenecks and exposing organizations to unmitigated anomaly risks.
 
-**Auditron** is an AI-driven intelligent system engineered to automate and secure these financial workflows. The platform operates as a decision intelligence platform (not an accounting system), designed to augment existing data pipelines with machine learning inference. 
+**FintechAnti** is an AI-driven intelligent system engineered to automate and secure these financial workflows. The platform operates as a decision intelligence platform (not an accounting system), designed to augment existing data pipelines with machine learning inference. 
 
 Key capabilities of the platform include:
 *   **Automated GST Classification:** Dynamic, schema-aware mapping of disparate transaction records into defined GST tax slabs.
@@ -33,7 +33,7 @@ The platform components are compartmentalized by function, utilizing modern data
 
 ## 3.1 High-Level Architecture
 
-Auditron utilizes a **microservices-based architecture**, allowing horizontal scalability and isolated failure domains. Each service encapsulates a distinct business domain and communicates over standard HTTP protocols. 
+FintechAnti utilizes a **microservices-based architecture**, allowing horizontal scalability and isolated failure domains. Each service encapsulates a distinct business domain and communicates over standard HTTP protocols. 
 
 The standard request flow follows:
 `User → Frontend → API Gateway → Core Services → DB / MLflow`
@@ -148,7 +148,7 @@ The end-to-end lifecycle of a data batch follows a strict deterministic sequence
 
 # 6. Key Design Principles
 
-Auditron is built adhering to the following structural constraints to ensure production-grade reliability:
+FintechAnti is built adhering to the following structural constraints to ensure production-grade reliability:
 
 *   **Microservices separation:** Hard boundaries between logic domains to decouple deployment and scaling constraints.
 *   **Stateless services:** API servers do not maintain local memory state between requests, relying entirely on persistence layers.
@@ -160,4 +160,4 @@ Auditron is built adhering to the following structural constraints to ensure pro
 
 # 7. Conclusion
 
-Auditron achieves a scalable fintech AI platform via the modular composition of modern distributed systems and robust machine learning pipelines. By operating independently of core accounting structures, it provides an auxiliary decision intelligence layer capable of real-time multi-dimensional inference. The synthesis of automated ML validation with explicit human-in-the-loop fallback creates a system tailored for rigid real-world compliance workflows, maintaining high adaptability to arbitrary financial data anomalies.
+FintechAnti achieves a scalable fintech AI platform via the modular composition of modern distributed systems and robust machine learning pipelines. By operating independently of core accounting structures, it provides an auxiliary decision intelligence layer capable of real-time multi-dimensional inference. The synthesis of automated ML validation with explicit human-in-the-loop fallback creates a system tailored for rigid real-world compliance workflows, maintaining high adaptability to arbitrary financial data anomalies.

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditron – Project Documentation</title>
+<style>
+/* === CORPORATE DOCUMENTATION THEME === */
+@page {
+  size: A4;
+  margin: 1in;
+  @bottom-center { content: counter(page); font-family: 'Inter', sans-serif; font-size: 10pt; color: #555; }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background: #fff;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 1in;
+}
+
+/* Headings */
+h1 {
+  font-size: 26pt;
+  font-weight: 800;
+  color: #1a3c6e;
+  margin-bottom: 12pt;
+  text-align: left;
+  border-bottom: 4px solid #1a3c6e;
+  padding-bottom: 10pt;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 18pt;
+  font-weight: 700;
+  color: #1a3c6e;
+  margin-top: 32pt;
+  margin-bottom: 12pt;
+  padding-bottom: 6pt;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+h3 {
+  font-size: 14pt;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 20pt;
+  margin-bottom: 8pt;
+  text-align: left;
+}
+
+/* Paragraphs */
+p {
+  margin-bottom: 10pt;
+  color: #374151;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16pt 0;
+  font-size: 10pt;
+}
+
+th {
+  font-weight: 600;
+  text-align: left;
+  padding: 8pt 10pt;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+td {
+  padding: 8pt 10pt;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  vertical-align: top;
+}
+
+tr:nth-child(even) td { background: #fcfdfe; }
+
+/* Lists */
+ul, ol { margin: 10pt 0 10pt 20pt; }
+li { margin-bottom: 6pt; color: #374151; }
+
+/* Code and Diagrams */
+pre {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 12pt;
+  overflow-x: auto;
+  margin: 16pt 0;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 9pt;
+  line-height: 1.4;
+}
+
+.mermaid {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20pt;
+  margin: 20pt 0;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Print optimizations */
+@media print {
+  body { padding: 0.5in; max-width: none; }
+  h2, h3 { break-after: avoid; page-break-after: avoid; }
+  .mermaid { break-inside: avoid; page-break-inside: avoid; }
+  .no-print { display: none !important; }
+  .mermaid svg { max-height: 180mm !important; width: 100% !important; }
+}
+
+/* Floating Actions */
+.actions {
+  position: fixed;
+  bottom: 24pt;
+  right: 24pt;
+  display: flex;
+  gap: 10pt;
+  z-index: 1000;
+}
+
+.btn {
+  background: #1a3c6e;
+  color: #fff;
+  border: none;
+  padding: 10pt 20pt;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 10pt;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.btn:hover { background: #15325c; transform: translateY(-1px); }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'neutral',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    securityLevel: 'loose'
+  });
+</script>
+</head>
+<body>
+
+<div class="actions no-print">
+  <button class="btn" onclick="window.print()">Download as PDF</button>
+</div>
+
+<!-- Title Page -->
+<div style="height: 90vh; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; text-align: center;">
+  <div>
+    <h1 style="font-size: 42pt; border: none; margin-bottom: 8pt; color: #1a3c6e; letter-spacing: -0.04em; text-align: center;">Auditron</h1>
+    <p style="font-size: 16pt; color: #4b5563; font-weight: 500; font-style: italic; text-align: center;">GST Classification & Anomaly Detection Platform for Indian SMEs</p>
+    <div style="width: 120pt; height: 3pt; background: #1a3c6e; margin: 24pt auto;"></div>
+  </div>
+
+  <div>
+    <p style="font-size: 12pt; text-transform: uppercase; letter-spacing: 0.2em; color: #6b7280; font-weight: 600; margin-bottom: 12pt;">Project Documentation</p>
+    <p style="font-size: 14pt; color: #1f2937; font-weight: 700;">System Architecture & Design Specification</p>
+  </div>
+
+  <div style="display: flex; justify-content: center; align-items: center; width: 100%; max-width: 600pt; margin: 0 auto;">
+    <table style="border-collapse: collapse; border: none; width: 100%; table-layout: fixed;">
+      <tr style="border: none; background: transparent;">
+        <td style="border: none; padding: 6pt 12pt; font-weight: 600; color: #6b7280; text-align: right; white-space: nowrap; width: 50%;">AUTHOR:</td>
+        <td style="border: none; padding: 6pt 12pt; text-align: left; font-weight: 700; color: #111827; white-space: nowrap; width: 50%;">Muhammed Shahinsha</td>
+      </tr>
+      <tr style="border: none; background: transparent;">
+        <td style="border: none; padding: 6pt 12pt; font-weight: 600; color: #6b7280; text-align: right; white-space: nowrap;">VERSION:</td>
+        <td style="border: none; padding: 6pt 12pt; text-align: left; white-space: nowrap;">1.0.0 (Production-Grade)</td>
+      </tr>
+      <tr style="border: none; background: transparent;">
+        <td style="border: none; padding: 6pt 12pt; font-weight: 600; color: #6b7280; text-align: right; white-space: nowrap;">DATE:</td>
+        <td style="border: none; padding: 6pt 12pt; text-align: left; white-space: nowrap;">March 18, 2026</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div style="page-break-after: always;"></div>
+
+<h2>1. Introduction</h2>
+<p>Financial transaction processing is fundamentally challenged by the massive volume of unstandardized data, the complexity of dynamic taxation slabs (GST at 0%, 5%, 18%, 40%), and an inherently high rate of human error. Traditional compliance workflows rely on post-facto manual effort, creating significant bottlenecks and exposing organizations to unmitigated anomaly risks.</p>
+
+<p><strong>Auditron</strong> is an AI-driven intelligent system engineered to automate and secure these financial workflows. The platform operates as a decision intelligence platform (not an accounting system), designed to augment existing data pipelines with machine learning inference.</p>
+
+<p>Key capabilities include:</p>
+<ul>
+  <li><strong>Automated GST Classification:</strong> Dynamic, schema-aware mapping of disparate transaction records into defined GST tax slabs.</li>
+  <li><strong>Multivariate Anomaly Detection:</strong> Ensemble-based detection of both structural outliers and semantic anomalies.</li>
+  <li><strong>Time-Series Forecasting:</strong> Predictive modeling of transaction volumes and category distributions.</li>
+  <li><strong>Human-in-the-Loop Review:</strong> Native feedback mechanisms that capture human corrections for continuous model improvement.</li>
+</ul>
+
+<h2>2. Methodology</h2>
+<p>The platform components are compartmentalized by function, utilizing modern data science and microservice engineering standards.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Technology</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ML Models</td>
+      <td>Random Forest, Isolation Forest, Autoencoder, TF-IDF</td>
+      <td>Classification of transactions and primary detection of numerical anomalies.</td>
+    </tr>
+    <tr>
+      <td>NLP</td>
+      <td>Sentence Transformers</td>
+      <td>Embedding generation for semantic text anomaly detection.</td>
+    </tr>
+    <tr>
+      <td>Orchestration</td>
+      <td>Microservices / API-based</td>
+      <td>Domain-driven isolation of core system functionalities ensuring scalability.</td>
+    </tr>
+    <tr>
+      <td>Backend</td>
+      <td>FastAPI</td>
+      <td>High-performance, asynchronous API routing and execution context.</td>
+    </tr>
+    <tr>
+      <td>Frontend</td>
+      <td>React</td>
+      <td>Single-page application (SPA) providing the user interface and human review dashboard.</td>
+    </tr>
+    <tr>
+      <td>Storage</td>
+      <td>PostgreSQL, File Storage</td>
+      <td>Relational persistence for metadata and local volume storage for raw/processed CSV arrays.</td>
+    </tr>
+    <tr>
+      <td>MLOps</td>
+      <td>MLflow</td>
+      <td>Experiment tracking, model registry, and lifecycle management.</td>
+    </tr>
+    <tr>
+      <td>Deployment</td>
+      <td>Docker, CI/CD</td>
+      <td>Containerization of services and automated testing/deployment pipelines.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. System Design and Architecture</h2>
+<h3>3.1 High-Level Architecture</h3>
+<p>Auditron utilizes a <strong>microservices-based architecture</strong>, allowing horizontal scalability and isolated failure domains. Each service encapsulates a distinct business domain and communicates over standard HTTP protocols.</p>
+
+<div class="mermaid">
+%%{init: {"themeVariables": {"fontSize": "16px"}, "flowchart": {"rankSpacing": 100, "nodeSpacing": 60, "curve": "linear"}}}%%
+flowchart TD
+    User["User"] --> Frontend["React Frontend"]
+
+    subgraph Microservices ["Core Services Layer"]
+        direction TB
+        AU["Auth Service"]
+        AN["Analytics Service"]
+        AS["Anomaly Service"]
+        CS["Classification Service"]
+        RT["Retraining Service"]
+    end
+
+    subgraph Storage ["File & Model Storage"]
+        direction TB
+        FS["Shared File Storage<br/>(CSV State Data)"]
+        ML["MLflow Registry<br/>(Model Repository)"]
+    end
+    
+    DB[("PostgreSQL 15<br/>(System Metadata)")]
+
+    Frontend --> AU
+    Frontend --> AN
+    Frontend --> AS
+    Frontend --> CS
+    Frontend --> RT
+
+    %% Storage connections
+    AN --> FS
+    AS --> FS
+    CS --> FS
+    
+    CS --> ML
+    RT --> ML
+
+    %% DB connections
+    AU ----> DB
+    AN ----> DB
+    AS ----> DB
+    CS ----> DB
+    RT ----> DB
+</div>
+
+<h2>4. Detailed Module Architecture</h2>
+
+<h3>Module 1 – Orchestrator / System Flow</h3>
+<p>The system orchestrator functions as the primary nervous system for the platform, ensuring correct serialization of tasks across distributed components without maintaining heavy state overhead.</p>
+<ul>
+  <li><strong>Route API calls:</strong> Direct incoming web traffic from the frontend to the appropriate microservice endpoints.</li>
+  <li><strong>Manage pipeline flow:</strong> Sequence asynchronous operations (e.g., waiting for classification before anomaly detection).</li>
+  <li><strong>Maintain state:</strong> Track temporary file paths, job IDs, and system metadata during batch execution.</li>
+</ul>
+
+<h3>Module 2 – Classification Architecture</h3>
+<p>This module forms the primary inference engine for GST categorization, designed to handle highly varied inbound CSV structures via schema hashing.</p>
+<div class="mermaid">
+flowchart LR
+    ING["Data Ingestion"] --> SCH["Schema Detection"]
+    SCH --> FE["Feature Engineering"]
+    FE --> INF["ML Classification"]
+    INF --> OUT["Output Generation"]
+</div>
+<ul>
+  <li><strong>Detect schema (A/B/C/D/H):</strong> Route data to the proper preprocessing pipeline based on column signatures.</li>
+  <li><strong>TF-IDF + Random Forest:</strong> Extract textual features and predict GST slab (0%, 5%, 18%, 40%).</li>
+  <li><strong>Confidence scoring:</strong> Output probability metrics to trigger manual review if below threshold.</li>
+</ul>
+
+<h3>Module 3 – Anomaly Detection Architecture</h3>
+<p>The anomaly system uses an ensemble approach to cover both numerical deviations and semantic textual mismatches.</p>
+<div class="mermaid">
+flowchart TD
+    DATA["Batch Data"] --> ND["Numeric Detector<br/>(Isolation Forest)"]
+    DATA --> TD["Text Detector<br/>(Embeddings)"]
+    DATA --> AE["Confidence Analyzer<br/>(Autoencoder)"]
+    
+    ND & TD & AE --> ENS["Ensemble Scoring Agent"]
+    ENS --> FLAG["Anomaly Flagging"]
+</div>
+<ul>
+  <li><strong>Isolation Forest:</strong> Identify statistical outliers in multi-dimensional numeric space.</li>
+  <li><strong>Autoencoder:</strong> Detect complex reconstruction errors indicating structural deviations.</li>
+  <li><strong>Embedding similarity:</strong> Flag semantic anomalies in unstructured text using Sentence Transformers.</li>
+  <li><strong>Adaptive thresholding:</strong> Dynamically adjust sensitivity based on historical batch distributions.</li>
+</ul>
+
+<h3>Module 4 – Analytics & Decision Layer</h3>
+<p>This layer converts raw prediction metadata into actionable business intelligence, interfacing directly with the user.</p>
+<ul>
+  <li><strong>KPI visualization:</strong> Render metrics for processed entries, anomaly rates, and latency.</li>
+  <li><strong>Human validation:</strong> Accept human overrides and record deltas for ground-truth updates.</li>
+  <li><strong>Time-series forecasting:</strong> Project future volume and anomaly load using Prophet/ARIMA.</li>
+  <li><strong>Insight generation:</strong> Provide explainable contexts for flagged transactions.</li>
+</ul>
+
+<h3>Module 5 – Retraining & MLOps Architecture</h3>
+<p>The MLOps module ensures models adapt to shifting transaction patterns captured via human feedback.</p>
+<ul>
+  <li><strong>Dataset aggregation:</strong> Compile raw data and human corrections into retraining corpora.</li>
+  <li><strong>Model training:</strong> Execute scheduled refitting of Random Forest models.</li>
+  <li><strong>Evaluation (Macro-F1):</strong> Score candidate models against standard validation matrices.</li>
+  <li><strong>Promotion logic:</strong> Conditionally advance models to 'Production' in MLflow if metrics exceed baseline.</li>
+</ul>
+
+<h2>5. Data Flow / Pipeline</h2>
+<p>The end-to-end lifecycle of a data batch follows a strict deterministic sequence:</p>
+<div class="mermaid">
+graph LR
+    CSV["Raw CSV"] --> PRE["Preprocessing"]
+    PRE --> CLS["Classification"]
+    CLS --> ANO["Anomaly Detection"]
+    ANO --> DASH["Dashboard"]
+    DASH --> REV["Review Queue"]
+    REV --> COR["Human Correction"]
+    COR --> RET["Retraining Pipeline"]
+</div>
+
+<h2>6. Key Design Principles</h2>
+<ul>
+  <li><strong>Microservices separation:</strong> Hard boundaries between logic domains to decouple scaling constraints.</li>
+  <li><strong>Stateless services:</strong> API servers do not maintain local memory state between requests.</li>
+  <li><strong>File-based data exchange:</strong> Heavy data matrices exchanged via volume mounts, avoiding memory saturation on transport layers.</li>
+  <li><strong>Human-in-the-loop:</strong> Architecture treats human override as a first-class citizen for mitigating model drift.</li>
+  <li><strong>Model lifecycle management:</strong> Strict promotion gates to prevent overfit model graduation.</li>
+</ul>
+
+<h2>7. Conclusion</h2>
+<p>Auditron achieves a scalable fintech AI platform via the modular composition of modern distributed systems and robust machine learning pipelines. By operating independently of core accounting structures, it provides an auxiliary decision intelligence layer tailored for rigid real-world compliance workflows.</p>
+
+</body>
+</html>

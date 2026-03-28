@@ -57,10 +57,8 @@ Thumbs.db
 storage/
 
 # Generated documentation and reports
-Auditron_Architecture_Documentation.html
-Auditron_Project_Report.html
-Auditron_Architecture_Documentation.pdf
-Auditron_Project_Report.pdf
+FintechAnti_Project_Report.html
+FintechAnti_Project_Report.pdf
 ARCHITECTURE_AND_DEPLOYMENT.md
 
 # Logs and linter outputs
