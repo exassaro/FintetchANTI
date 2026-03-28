@@ -1,4 +1,4 @@
-name: FintechAnti CI Pipeline
+name: Auditron CI Pipeline
 
 on:
   push:
@@ -103,7 +103,7 @@ jobs:
       - name: Build Docker Image
         run: |
           cd ${{ matrix.service }}
-          docker build -t fintechanti-${{ matrix.service }}:test .
+          docker build -t auditron-${{ matrix.service }}:test .
 
   deploy:
     name: Continuous Deployment
@@ -121,7 +121,7 @@ jobs:
           echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST << 'EOF'
-            cd ~/FintetchANTI
+            cd ~/Auditron
             git pull origin main
             docker-compose down
             docker-compose up -d --build
