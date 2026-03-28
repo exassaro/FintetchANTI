@@ -4,8 +4,8 @@ import os
 from typing import Tuple, Dict, Any
 from groq import Groq
 
-# The user's provided API key is set here as a fallback if not in env vars
-_GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "SECRET_REPLACED_OLD_GROQ_KEY")
+# The Groq API key should be set in the GROQ_API_KEY environment variable.
+_GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 client = Groq(api_key=_GROQ_API_KEY)
 
