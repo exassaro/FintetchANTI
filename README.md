@@ -1,4 +1,4 @@
-# FintechAnti - Indian SME GST Classification & Anomaly Detection
+# Auditron - Indian SME GST Classification & Anomaly Detection
 
 A production-grade analytics platform built to classify transaction data for Indian Small and Medium Enterprises (SMEs), detect anomalies, and facilitate a human-in-the-loop review queue for data refinement.
 
