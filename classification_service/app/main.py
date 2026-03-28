@@ -20,13 +20,13 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="GST Classification Service",
+    title="Auditron - GST Classification Service",
     version="1.0.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://fintetch-anti.vercel.app")],
+    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://auditron.vercel.app")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -59,7 +59,7 @@ async def lifespan(app: FastAPI):
 # FastAPI APPLICATION
 # ==========================================================
 app = FastAPI(
-    title="Retraining Service",
+    title="Auditron - Retraining Service",
     description="Microservice for background ML pipeline retraining and promotion",
     version="1.0.0",
     lifespan=lifespan
@@ -67,7 +67,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://fintetch-anti.vercel.app")],
+    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "https://auditron.vercel.app")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
