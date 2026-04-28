@@ -181,7 +181,7 @@ export default function LoginPage() {
                             letterSpacing: '-0.03em', marginBottom: 8,
                             lineHeight: 1.2,
                         }}>
-                            FintechAnti
+                            Auditron
                         </h1>
                         <p style={{
                             fontSize: '0.85rem', opacity: 0.85,
