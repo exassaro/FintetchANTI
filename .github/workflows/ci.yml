@@ -35,7 +35,7 @@ jobs:
           cd ${{ matrix.service }}
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest ruff
+          pip install pytest "ruff==0.15.12"
 
       - name: Lint with Ruff
         run: |
