@@ -121,10 +121,11 @@ jobs:
           echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST << 'EOF'
+            set -e
             cd ~/FintetchANTI
             git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+            for s in $(docker compose config --services); do docker compose build $s; done
+            docker compose up -d
             docker image prune -f
           EOF
 
