@@ -11,5 +11,5 @@ statsmodels
 scikit-learn
 python-multipart
 plotly
-groq
+groq==1.0.0
 httpx

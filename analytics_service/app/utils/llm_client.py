@@ -3,11 +3,27 @@
 import os
 from typing import Tuple, Dict, Any
 from groq import Groq
+from dotenv import load_dotenv
+
+# Load .env from the project root (two levels up from this file)
+load_dotenv()
 
 # The Groq API key should be set in the GROQ_API_KEY environment variable.
 _GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
-client = Groq(api_key=_GROQ_API_KEY)
+# Lazy singleton — client is created on first use, not at import time
+_client: Groq | None = None
+
+def _get_client() -> Groq:
+    global _client
+    if _client is None:
+        api_key = os.environ.get("GROQ_API_KEY", _GROQ_API_KEY)
+        if not api_key:
+            raise RuntimeError(
+                "GROQ_API_KEY is not set. Add it to your .env file or environment."
+            )
+        _client = Groq(api_key=api_key)
+    return _client
 
 def call_llm(context_payload: Dict[str, Any]) -> Tuple[str, str]:
     """
@@ -71,7 +87,7 @@ def call_llm(context_payload: Dict[str, Any]) -> Tuple[str, str]:
         """
 
     try:
-        response = client.chat.completions.create(
+        response = _get_client().chat.completions.create(
             messages=[
                 {
                     "role": "system",

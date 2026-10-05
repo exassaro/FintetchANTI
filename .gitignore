@@ -70,3 +70,5 @@ run_all_tests.ps1
 start_services.ps1
 
 scripts/
+
+*.pem
