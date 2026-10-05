@@ -4,6 +4,7 @@ import {
     AlertTriangle, CheckCircle, XCircle, Eye, Filter, Loader2, Calendar, Search, Sparkles
 } from 'lucide-react';
 import { usePipeline } from '../context/PipelineContext';
+import MarkdownMessage from '../components/MarkdownMessage';
 import { getReviewQueue, submitReviewDecision, clearReviewQueueCache, sendChatbotQuery } from '../api/analytics';
 import {
     Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
@@ -495,7 +496,7 @@ export default function ReviewPage() {
                                                                         </div>
                                                                     ) : enhancedReasons[row.row_index] ? (
                                                                         <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.5, background: 'var(--bg-primary)', padding: 12, borderRadius: 6, border: '1px solid var(--border)' }}>
-                                                                            {enhancedReasons[row.row_index]}
+                                                                            <MarkdownMessage>{enhancedReasons[row.row_index]}</MarkdownMessage>
                                                                         </div>
                                                                     ) : (
                                                                         <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Click the button above to generate contextual data using the LLM.</div>

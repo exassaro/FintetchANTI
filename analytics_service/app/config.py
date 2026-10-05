@@ -29,8 +29,15 @@ class Settings(BaseSettings):
     NEWSDATA_API_KEY: str | None = None
     MEDIASTACK_API_KEY: str | None = None
 
+    # LLM (read via os.environ in app/utils/llm_client.py; declared here so
+    # the key in .env passes validation)
+    GROQ_API_KEY: str | None = None
+    GROQ_MODEL: str | None = None
+
     class Config:
         env_file = ".env"
+        # Ignore unrelated keys in .env instead of failing at startup
+        extra = "ignore"
 
 
 settings = Settings()

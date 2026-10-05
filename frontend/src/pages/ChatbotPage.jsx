@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, Bot, User, Sparkles, Lightbulb, AlertTriangle } from 'lucide-react';
 import { usePipeline } from '../context/PipelineContext';
@@ -8,6 +8,7 @@ import {
     Box, Fade, Grow
 } from '@mui/material';
 import logoUrl from '../assets/logogreen.svg';
+import MarkdownMessage from '../components/MarkdownMessage';
 
 const SUGGESTIONS = [
     'What is the total GST liability?',
@@ -170,12 +171,11 @@ export default function ChatbotPage() {
                                                 style={msg.isError ? { borderColor: 'var(--accent-rose)', background: 'rgba(244,63,94,0.06)' } : {}}
                                             >
                                                 {msg.isError && <AlertTriangle size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle', color: 'var(--accent-rose)' }} />}
-                                                {typeof msg.content === 'string' ? msg.content.split('\n').map((line, k) => (
-                                                    <React.Fragment key={k}>
-                                                        {line}
-                                                        {k < msg.content.split('\n').length - 1 && <br />}
-                                                    </React.Fragment>
-                                                )) : msg.content}
+                                                {typeof msg.content !== 'string'
+                                                    ? msg.content
+                                                    : msg.role === 'bot' && !msg.isError
+                                                        ? <MarkdownMessage>{msg.content}</MarkdownMessage>
+                                                        : <span style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</span>}
                                                 {msg.intent && (
                                                     <Box sx={{ mt: 0.8 }}>
                                                         <Chip
