@@ -30,7 +30,7 @@ def call_llm(context_payload: Dict[str, Any]) -> Tuple[str, str]:
     Calls the Groq LLM provider to explain an anomaly or answer a general query.
     Returns explanation text and model name.
     """
-    model_name = "llama-3.3-70b-versatile"  # Groq's fast Llama 3 model
+    model_name = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")  # Groq's fast Llama 3 model
 
     # Case 1: General Query Fallback or Data Formatting
     if "query" in context_payload:
