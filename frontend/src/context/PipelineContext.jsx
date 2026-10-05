@@ -5,12 +5,12 @@ const PipelineContext = createContext(null);
 const STORAGE_KEY = 'gst_pipeline_session';
 
 /**
- * Read the persisted pipeline session from sessionStorage.
+ * Read the persisted pipeline session from localStorage.
  * Returns an object with uploadId, classificationResult, anomalyResult, pipelineStage.
  */
 function loadSession() {
     try {
-        const raw = sessionStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) return JSON.parse(raw);
     } catch {
         /* corrupted – ignore */
@@ -19,22 +19,26 @@ function loadSession() {
 }
 
 /**
- * Write the current pipeline state to sessionStorage.
+ * Write the current pipeline state to localStorage.
  */
 function saveSession(state) {
     try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
         /* storage full – best effort */
     }
 }
 
 /**
- * Remove the pipeline session from sessionStorage.
+ * Remove the pipeline session from localStorage.
  * Called on signout or new CSV upload.
  */
 export function clearPipelineSession() {
-    sessionStorage.removeItem(STORAGE_KEY);
+    try {
+        localStorage.removeItem(STORAGE_KEY);
+    } catch {
+        /* storage unavailable – nothing to clear */
+    }
 }
 
 export const PipelineProvider = ({ children }) => {
@@ -46,9 +50,9 @@ export const PipelineProvider = ({ children }) => {
     const [pipelineStage, setPipelineStageRaw] = useState(saved?.pipelineStage ?? 'idle');
     // stages: idle | uploading | classifying | classified | detecting | detected | analytics
 
-    // Wrap every setter so it also persists to sessionStorage
+    // Wrap every setter so it also persists to localStorage
     const persist = useCallback((patch) => {
-        // We read the current values from sessionStorage to merge correctly,
+        // We read the current values from localStorage to merge correctly,
         // but for simplicity we keep an up-to-date ref via the patch pattern.
         const current = loadSession() || {};
         saveSession({ ...current, ...patch });

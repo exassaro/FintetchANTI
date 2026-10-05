@@ -6,6 +6,7 @@ import axios from 'axios'
 import theme from './theme'
 import './index.css'
 import App from './App.jsx'
+import { clearPipelineSession } from './context/PipelineContext'
 
 // ── Global Axios Interceptor ───────────────────────
 // Automatically attach JWT Bearer token to ALL outgoing requests
@@ -23,6 +24,7 @@ axios.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 && window.location.pathname !== '/') {
       localStorage.removeItem('auth_token');
+      clearPipelineSession();
       window.location.href = '/';
     }
     return Promise.reject(error);
